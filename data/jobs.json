@@ -1,0 +1,192 @@
+[
+  {
+    "id": "northstar-ml-001",
+    "title": "Machine Learning Engineer",
+    "company": "Northstar Health AI",
+    "location": "Chicago, IL",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "salary_range": "$118,000–$148,000",
+    "description": "Build and operate machine-learning services that help hospital care teams identify patients who may benefit from earlier clinical intervention. You will partner with data scientists and platform engineers to turn validated models into monitored, auditable production APIs. This role works with sensitive health data and values reproducibility, careful model evaluation, and clear documentation over experimentation for its own sake.",
+    "responsibilities": [
+      "Productionize PyTorch and scikit-learn models behind reliable Python APIs",
+      "Create model monitoring for drift, calibration, latency, and data-quality signals",
+      "Collaborate with clinical stakeholders to document assumptions and failure modes",
+      "Improve containerized training and deployment workflows on AWS"
+    ],
+    "required_skills": ["Python", "PyTorch", "SQL", "AWS", "Docker", "MLOps"],
+    "preferred_skills": ["FastAPI", "MLflow", "Healthcare data", "Kubernetes"]
+  },
+  {
+    "id": "loopline-fe-002",
+    "title": "Frontend Product Engineer",
+    "company": "Loopline Collaboration",
+    "location": "Remote — United States",
+    "work_mode": "Remote",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "salary_range": "$110,000–$142,000",
+    "description": "Own polished user-facing workflows for a collaborative planning product used by distributed teams. The product includes data-dense timelines, real-time presence, and accessible keyboard interactions. Engineers work directly with design and customer research, ship in small increments, and are expected to contribute to frontend architecture as well as product decisions.",
+    "responsibilities": [
+      "Develop responsive product experiences with React, TypeScript, and Next.js",
+      "Translate design-system patterns into accessible, reusable components",
+      "Write unit and browser-level tests for critical planning workflows",
+      "Use product analytics and customer feedback to refine shipped features"
+    ],
+    "required_skills": ["React", "TypeScript", "Next.js", "CSS", "Testing", "Accessibility"],
+    "preferred_skills": ["Playwright", "Design systems", "WebSockets", "Product analytics"]
+  },
+  {
+    "id": "greengrid-ds-003",
+    "title": "Data Scientist, Energy Analytics",
+    "company": "GreenGrid Systems",
+    "location": "Austin, TX",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "salary_range": "$112,000–$145,000",
+    "description": "Develop forecasting and decision-support models for commercial energy customers managing solar generation, storage, and time-of-use pricing. The team combines telemetry, weather, and billing data to recommend operational changes with measurable cost and emissions outcomes. Success requires both statistical rigor and the ability to explain results to non-technical partners.",
+    "responsibilities": [
+      "Build and evaluate time-series forecasts and causal impact analyses",
+      "Create reproducible data preparation and model-evaluation pipelines",
+      "Design decision-ready Tableau dashboards for operations teams",
+      "Present model limitations and business recommendations to customers"
+    ],
+    "required_skills": ["Python", "SQL", "scikit-learn", "Statistics", "Time series", "Tableau"],
+    "preferred_skills": ["Causal inference", "Energy markets", "dbt", "Airflow"]
+  },
+  {
+    "id": "finwave-be-004",
+    "title": "Backend Python Engineer",
+    "company": "Finwave Ledger",
+    "location": "New York, NY",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "salary_range": "$125,000–$158,000",
+    "description": "Build high-integrity services for a financial reconciliation platform that processes millions of ledger events each day. You will design APIs and asynchronous workflows, improve observability, and collaborate with security and product teams on controls that make every state transition traceable. The team favors simple architectures, explicit contracts, and comprehensive automated tests.",
+    "responsibilities": [
+      "Design typed REST APIs and background services with Python and FastAPI",
+      "Model transactional workflows in PostgreSQL and Redis",
+      "Improve service observability, performance, and failure recovery",
+      "Participate in threat modeling and peer review for financial controls"
+    ],
+    "required_skills": ["Python", "FastAPI", "PostgreSQL", "Redis", "Docker", "AWS"],
+    "preferred_skills": ["Kafka", "Terraform", "OpenTelemetry", "Fintech"]
+  },
+  {
+    "id": "vectorforge-ai-005",
+    "title": "AI Research Engineer",
+    "company": "Vector Forge Labs",
+    "location": "Boston, MA",
+    "work_mode": "On-site",
+    "employment_type": "Full-time",
+    "experience_level": "Entry-level",
+    "salary_range": "$105,000–$135,000",
+    "description": "Prototype and evaluate retrieval-augmented language-model systems for scientific literature discovery. You will reproduce recent papers, curate evaluation sets with research partners, and convert promising experiments into efficient internal tools. This position suits a strong new graduate who enjoys reading papers, writing careful experiments, and communicating negative results as clearly as successful ones.",
+    "responsibilities": [
+      "Implement transformer and retrieval experiments in Python and PyTorch",
+      "Design evaluations for answer quality, grounding, latency, and cost",
+      "Reproduce relevant research and summarize findings for engineering teams",
+      "Build lightweight demos that turn research results into testable workflows"
+    ],
+    "required_skills": ["Python", "PyTorch", "Transformers", "NLP", "Machine learning", "Research methods"],
+    "preferred_skills": ["Hugging Face", "Vector databases", "RAG", "Published research"]
+  },
+  {
+    "id": "civicstack-fs-006",
+    "title": "Full-Stack Software Developer",
+    "company": "CivicStack Digital",
+    "location": "St. Louis, MO",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Entry-level",
+    "salary_range": "$82,000–$106,000",
+    "description": "Deliver accessible digital services for local governments, including permit applications, public records, and case-status tools. Developers rotate across discovery, implementation, and support so that technical decisions remain connected to resident needs. The codebase combines a Python web platform with a modern React interface and a strong automated testing culture.",
+    "responsibilities": [
+      "Implement end-to-end features in Django, React, and PostgreSQL",
+      "Pair with designers to meet WCAG accessibility requirements",
+      "Write automated tests and participate in supportive code reviews",
+      "Interview service staff and translate policy rules into clear workflows"
+    ],
+    "required_skills": ["Python", "Django", "React", "JavaScript", "PostgreSQL", "Git"],
+    "preferred_skills": ["TypeScript", "Accessibility", "Docker", "Public-sector technology"]
+  },
+  {
+    "id": "nimbus-platform-007",
+    "title": "Cloud Platform Engineer",
+    "company": "Nimbus Retail Technologies",
+    "location": "Denver, CO or Remote",
+    "work_mode": "Remote",
+    "employment_type": "Full-time",
+    "experience_level": "Senior",
+    "salary_range": "$142,000–$176,000",
+    "description": "Evolve the internal cloud platform used by product teams supporting a national retail network. The platform group provides paved-road deployment templates, observability, secrets management, and incident support. This role balances hands-on infrastructure work with coaching application teams toward safer and more autonomous operations.",
+    "responsibilities": [
+      "Build reusable AWS infrastructure modules with Terraform",
+      "Operate Kubernetes clusters and improve deployment safety through CI/CD",
+      "Define service-level indicators and lead blameless incident reviews",
+      "Create self-service tooling and documentation for product engineers"
+    ],
+    "required_skills": ["AWS", "Kubernetes", "Terraform", "CI/CD", "Linux", "Python"],
+    "preferred_skills": ["Argo CD", "Prometheus", "Go", "Platform engineering"]
+  },
+  {
+    "id": "sentinel-cyber-008",
+    "title": "Cybersecurity Operations Analyst",
+    "company": "Sentinel Harbor Defense",
+    "location": "Washington, DC",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Entry-level",
+    "salary_range": "$88,000–$112,000",
+    "description": "Investigate security alerts and strengthen detection coverage for regulated public-sector customers. Analysts combine structured incident procedures with curious technical investigation across endpoint, identity, cloud, and network telemetry. The team provides mentorship and values clear evidence trails, calm communication, and thoughtful automation of repetitive work.",
+    "responsibilities": [
+      "Triage SIEM alerts and document evidence during incident investigations",
+      "Write Python automations for enrichment and repetitive response tasks",
+      "Tune detections using endpoint, identity, and network telemetry",
+      "Map findings and response procedures to NIST security guidance"
+    ],
+    "required_skills": ["SIEM", "Incident response", "Python", "Networking", "Linux", "NIST"],
+    "preferred_skills": ["Splunk", "Cloud security", "Security+", "Threat hunting"]
+  },
+  {
+    "id": "atlas-data-009",
+    "title": "Data Engineer",
+    "company": "Atlas Logistics Intelligence",
+    "location": "Dallas, TX",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "salary_range": "$115,000–$146,000",
+    "description": "Create trustworthy data products for route planning, carrier performance, and delivery forecasting. The data team ingests high-volume operational events, models them for analytics and machine learning, and owns data-quality expectations with business stakeholders. Engineers are expected to make pipelines observable and understandable, not merely fast.",
+    "responsibilities": [
+      "Develop batch and streaming transformations with Python, SQL, and Spark",
+      "Orchestrate tested data pipelines with Airflow",
+      "Model analytics datasets in Snowflake and document data contracts",
+      "Implement freshness, completeness, and anomaly monitoring"
+    ],
+    "required_skills": ["Python", "SQL", "Apache Spark", "Airflow", "Snowflake", "Data modeling"],
+    "preferred_skills": ["Kafka", "dbt", "Great Expectations", "Logistics data"]
+  },
+  {
+    "id": "brightpath-pa-010",
+    "title": "Product Data Analyst",
+    "company": "BrightPath Learning",
+    "location": "Chicago, IL",
+    "work_mode": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Entry-level",
+    "salary_range": "$78,000–$102,000",
+    "description": "Help an education-technology product team understand how learners discover, start, and complete career-focused courses. You will define metrics with product managers, analyze experiments, and create clear self-service reporting. The strongest candidates combine sound SQL and statistical reasoning with empathy for how imperfect behavioral data can be misinterpreted.",
+    "responsibilities": [
+      "Query product and learning data with SQL and Python",
+      "Design experiment readouts and guardrail metrics with product partners",
+      "Build maintained Tableau dashboards and concise decision memos",
+      "Investigate data quality issues before presenting conclusions"
+    ],
+    "required_skills": ["SQL", "Python", "Experimentation", "Statistics", "Tableau", "Communication"],
+    "preferred_skills": ["Amplitude", "dbt", "Education technology", "A/B testing"]
+  }
+]

@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+.DS_Store
+
+# Sentence Transformers / Hugging Face model cache (keep it outside Git)
+.cache/
