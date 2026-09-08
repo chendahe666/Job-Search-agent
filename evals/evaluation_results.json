@@ -1,0 +1,87 @@
+{
+  "metrics_summary": {
+    "Human Baseline": {
+      "mean_precision_at_5": 0.88,
+      "mean_latency_ms": 2.05,
+      "hallucination_rate": "0.00%",
+      "explainability_provenance": "100.0%",
+      "system_cost_per_100_queries": "$0.00"
+    },
+    "Naive AI Baseline": {
+      "mean_precision_at_5": 0.68,
+      "mean_latency_ms": 0.3,
+      "hallucination_rate": "32.50%",
+      "explainability_provenance": "12.0%",
+      "system_cost_per_100_queries": "$4.80"
+    },
+    "Human-AI Co-Design": {
+      "mean_precision_at_5": 0.8,
+      "mean_latency_ms": 244.26,
+      "hallucination_rate": "0.00%",
+      "explainability_provenance": "100.0%",
+      "system_cost_per_100_queries": "$0.00"
+    }
+  },
+  "detailed_runs": [
+    {
+      "profile_id": "p1_junior_ds",
+      "profile_name": "Alex Chen (Junior ML & Data Scientist)",
+      "human_top1": "E-Commerce Data Scientist, Personalization",
+      "human_score": 0.8117,
+      "ai_top1": "E-Commerce Data Scientist, Personalization",
+      "ai_score": 0.8643,
+      "codesign_top1": "Quantitative ML Researcher",
+      "codesign_score": 0.472,
+      "codesign_grounding_cov": 0.8333,
+      "codesign_ats_score": 93
+    },
+    {
+      "profile_id": "p2_senior_backend",
+      "profile_name": "Marcus Vance (Senior Distributed Systems)",
+      "human_top1": "Backend Systems Engineer",
+      "human_score": 0.92,
+      "ai_top1": "Backend Systems Engineer",
+      "ai_score": 0.98,
+      "codesign_top1": "Backend Systems Engineer",
+      "codesign_score": 0.5235,
+      "codesign_grounding_cov": 1.0,
+      "codesign_ats_score": 98
+    },
+    {
+      "profile_id": "p3_frontend_dev",
+      "profile_name": "Elena Rostova (Frontend & UI Engineer)",
+      "human_top1": "Frontend Product Engineer",
+      "human_score": 0.92,
+      "ai_top1": "Frontend Product Engineer",
+      "ai_score": 0.98,
+      "codesign_top1": "UI/UX Design Systems Engineer",
+      "codesign_score": 0.5344,
+      "codesign_grounding_cov": 0.8333,
+      "codesign_ats_score": 93
+    },
+    {
+      "profile_id": "p4_cloud_devops",
+      "profile_name": "Jordan Taylor (Cloud Platform Engineer)",
+      "human_top1": "Cloud Platform & DevOps Engineer",
+      "human_score": 0.92,
+      "ai_top1": "Cloud Platform & DevOps Engineer",
+      "ai_score": 0.98,
+      "codesign_top1": "Cloud Platform & DevOps Engineer",
+      "codesign_score": 0.594,
+      "codesign_grounding_cov": 1.0,
+      "codesign_ats_score": 98
+    },
+    {
+      "profile_id": "p5_appsec_analyst",
+      "profile_name": "Samantha Wei (Application Security Engineer)",
+      "human_top1": "Application Security Engineer",
+      "human_score": 0.92,
+      "ai_top1": "Application Security Engineer",
+      "ai_score": 0.98,
+      "codesign_top1": "Application Security Engineer",
+      "codesign_score": 0.5577,
+      "codesign_grounding_cov": 1.0,
+      "codesign_ats_score": 98
+    }
+  ]
+}
