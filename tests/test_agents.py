@@ -52,6 +52,21 @@ class FakeGroqClient:
         self.chat = SimpleNamespace(completions=FakeCompletions())
 
 
+class FakeGeminiClient:
+    def __init__(self):
+        class FakeModels:
+            def generate_content(self, model: str, contents: str, **kwargs):
+                content = (
+                    '{"summary":"Strong Python evidence with a measurable SQL gap.",'
+                    '"matched_strengths":["Python appears in both profile and role."],'
+                    '"skill_gaps":["SQL is not listed in the profile."],'
+                    '"next_step":"Add a small SQL project to the portfolio."}'
+                )
+                return SimpleNamespace(text=content)
+
+        self.models = FakeModels()
+
+
 class ProfileAnalyzerTests(unittest.TestCase):
     def test_normalizes_and_deduplicates_profile_input(self):
         profile = ProfileAnalyzer().analyze(
@@ -134,6 +149,15 @@ class ReasoningAgentTests(unittest.TestCase):
         ).explain(self.profile, self.job, 0.72)
 
         self.assertEqual(explanation.source, "Groq · test-model")
+        self.assertEqual(len(explanation.matched_strengths), 1)
+        self.assertFalse(explanation.warning)
+
+    def test_structures_gemini_llm_response(self):
+        explanation = ReasoningAgent(
+            client=FakeGeminiClient(), model="gemini-1.5-flash"
+        ).explain(self.profile, self.job, 0.72)
+
+        self.assertEqual(explanation.source, "Google Gemini · gemini-1.5-flash")
         self.assertEqual(len(explanation.matched_strengths), 1)
         self.assertFalse(explanation.warning)
 

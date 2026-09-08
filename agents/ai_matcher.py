@@ -29,6 +29,9 @@ from .profile_analyzer import UserProfile
 class AIMatcher:
     """Monolithic single-prompt AI matching agent reflecting Stage 2 AI design."""
 
+    DEFAULT_GEMINI_MODEL = "gemini-1.5-flash"
+    DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
+
     PROMPT_TEMPLATE = (
         "You are an expert technical recruiter AI. Evaluate the fit between the "
         "following candidate profile and job posting.\n\n"
@@ -49,12 +52,19 @@ class AIMatcher:
         self,
         api_key: str | None = None,
         *,
-        model: str = "llama-3.3-70b-versatile",
+        provider: str = "gemini",
+        model: str | None = None,
         client: Any | None = None,
     ) -> None:
-        self.api_key = api_key or os.getenv("GROQ_API_KEY", "")
-        self.model = model
+        self.provider = provider.lower().strip()
         self._client = client
+
+        if self.provider == "gemini":
+            self.api_key = (api_key or os.getenv("GEMINI_API_KEY", "")).strip()
+            self.model = model or os.getenv("GEMINI_MODEL", self.DEFAULT_GEMINI_MODEL)
+        else:
+            self.api_key = (api_key or os.getenv("GROQ_API_KEY", "")).strip()
+            self.model = model or os.getenv("GROQ_MODEL", self.DEFAULT_GROQ_MODEL)
 
     def _simulate_naive_ai(
         self, profile: UserProfile, job: dict[str, Any]
@@ -125,22 +135,67 @@ class AIMatcher:
         # Real LLM execution path
         start_time = time.perf_counter()
         try:
-            from groq import Groq
-            client = self._client or Groq(api_key=self.api_key)
             prompt = self.PROMPT_TEMPLATE.format(
                 profile_json=json.dumps(profile.to_prompt_dict()),
                 job_json=json.dumps(job),
             )
-            response = client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": "You are a job match evaluator. Return only JSON."},
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.2,
-                response_format={"type": "json_object"},
-            )
-            parsed = json.loads(response.choices[0].message.content or "{}")
+            tokens_used = 1200
+            if self.provider == "gemini":
+                # Call Gemini
+                try:
+                    from google import genai
+                    from google.genai import types
+
+                    client = self._client or genai.Client(api_key=self.api_key)
+                    resp = client.models.generate_content(
+                        model=self.model,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            temperature=0.2,
+                        ),
+                    )
+                    content = resp.text or "{}"
+                except Exception:
+                    import requests
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+                    r = requests.post(
+                        url,
+                        headers={"Content-Type": "application/json"},
+                        json={
+                            "contents": [{"parts": [{"text": prompt}]}],
+                            "generationConfig": {
+                                "responseMimeType": "application/json",
+                                "temperature": 0.2,
+                            },
+                        },
+                        timeout=20,
+                    )
+                    r.raise_for_status()
+                    parts = r.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
+                    content = parts[0].get("text", "{}") if parts else "{}"
+                method_label = f"Stage 2 AI Design (Google Gemini · {self.model})"
+            else:
+                if self._client is not None:
+                    client = self._client
+                else:
+                    from groq import Groq
+                    client = Groq(api_key=self.api_key)
+                response = client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": "You are a job match evaluator. Return only JSON."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.2,
+                    response_format={"type": "json_object"},
+                )
+                content = response.choices[0].message.content or "{}"
+                tokens_used = response.usage.total_tokens if response.usage else 1200
+                method_label = f"Stage 2 AI Design (Groq · {self.model})"
+
+            cleaned = content.strip().lstrip("```json").rstrip("```").strip()
+            parsed = json.loads(cleaned)
             elapsed_ms = (time.perf_counter() - start_time) * 1000
 
             # Audit against candidate profile for hallucination
@@ -158,8 +213,8 @@ class AIMatcher:
                 "hallucination_flag": len(hallucinations) > 0,
                 "hallucinated_claims": hallucinations,
                 "latency_ms": round(elapsed_ms, 2),
-                "token_cost_est": response.usage.total_tokens if response.usage else 1200,
-                "method": "Stage 2 AI Design (Live Groq LLM)",
+                "token_cost_est": tokens_used,
+                "method": method_label,
             }
         except Exception:
             # Fallback to simulated naive AI

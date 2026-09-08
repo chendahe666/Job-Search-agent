@@ -384,10 +384,43 @@ def render_sidebar() -> dict[str, Any]:
         use_expanded = st.checkbox("Use Expanded Corpus (40 Tech Roles)", value=True)
         top_k = st.slider("Top K Recommendations", 1, 10, 5)
 
+        st.divider()
+        st.markdown("### 4. AI Reasoning Provider")
+        llm_provider = st.selectbox(
+            "Select LLM Service",
+            ["Google Gemini (Official · Free Quota)", "Groq (Llama-3.3)", "Local Offline ($0 / No Key)"],
+            index=0,
+        )
+        gemini_key = ""
+        groq_key = ""
+        llm_model = "gemini-1.5-flash"
+        if "Gemini" in llm_provider:
+            gemini_key = st.text_input(
+                "Gemini API Key",
+                value=os.getenv("GEMINI_API_KEY", ""),
+                type="password",
+                help="Get your free key at https://aistudio.google.com/apikey",
+            )
+            llm_model = st.selectbox("Gemini Model", ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"], index=0)
+            st.caption("✨ Powered by Google Gemini API (15 RPM / 1M TPM free tier)")
+        elif "Groq" in llm_provider:
+            groq_key = st.text_input(
+                "Groq API Key",
+                value=os.getenv("GROQ_API_KEY", ""),
+                type="password",
+            )
+            llm_model = st.text_input("Groq Model", value="llama-3.3-70b-versatile")
+        else:
+            st.caption("🔒 Running completely offline with local deterministic rules.")
+
     return {
         "engine_mode": engine_mode,
         "use_expanded": use_expanded,
         "top_k": top_k,
+        "llm_provider": llm_provider,
+        "gemini_key": gemini_key.strip(),
+        "groq_key": groq_key.strip(),
+        "llm_model": llm_model,
     }
 
 
@@ -407,6 +440,23 @@ def execute_match_workflow(settings: dict[str, Any], jobs: list[dict[str, Any]])
         return
 
     mode = settings["engine_mode"]
+    provider = (
+        "gemini"
+        if "Gemini" in settings["llm_provider"]
+        else ("groq" if "Groq" in settings["llm_provider"] else "offline")
+    )
+    api_key = (
+        settings["gemini_key"]
+        if provider == "gemini"
+        else (settings["groq_key"] if provider == "groq" else "")
+    )
+    model = settings["llm_model"] if provider != "offline" else None
+
+    reasoning_agent = ReasoningAgent(
+        api_key=api_key,
+        provider=provider,
+        model=model,
+    )
 
     with st.status(f"Executing {mode}…", expanded=True) as status:
         if "Stage 1" in mode:
@@ -416,8 +466,8 @@ def execute_match_workflow(settings: dict[str, Any], jobs: list[dict[str, Any]])
             st.session_state.match_results = {"mode": "Stage 1", "jobs": ranked, "profile": profile}
 
         elif "Stage 2" in mode:
-            st.write("Running Stage 2 AI Baseline: Monolithic Prompt Matching…")
-            matcher = AIMatcher(api_key="")
+            st.write(f"Running Stage 2 AI Baseline ({provider.capitalize()} LLM)…")
+            matcher = AIMatcher(api_key=api_key, provider=provider, model=model)
             ranked = matcher.rank_jobs(profile, jobs, top_k=settings["top_k"])
             st.session_state.match_results = {"mode": "Stage 2", "jobs": ranked, "profile": profile}
 
@@ -425,17 +475,18 @@ def execute_match_workflow(settings: dict[str, Any], jobs: list[dict[str, Any]])
             st.write("Running Stage 3 Co-Design: BM25 Lexical + Dense Semantic Embedding…")
             hybrid = get_hybrid_engine()
             ranked = hybrid.rank_jobs(profile, jobs, top_k=settings["top_k"])
-            st.write("Auditing Grounding Tree & Generating Traceable Resume Bullets…")
+            st.write("Auditing Grounding Tree & Generating Fit Explanations…")
             audited = []
             for j in ranked:
                 rep = EvidenceGrounder.audit_match(profile, j)
-                audited.append({"job": j, "audit": rep})
+                explanation = reasoning_agent.explain(profile, j, float(j["match_score"]))
+                audited.append({"job": j, "audit": rep, "explanation": explanation})
             st.session_state.match_results = {"mode": "Stage 3", "items": audited, "profile": profile}
 
         elif "Arena" in mode:
             st.write("Executing 3-Way Arena Comparison across Stage 1, Stage 2, and Stage 3…")
             h_matcher = HumanMatcher()
-            ai_matcher = AIMatcher(api_key="")
+            ai_matcher = AIMatcher(api_key=api_key, provider=provider, model=model)
             hybrid = get_hybrid_engine()
 
             h_ranked = h_matcher.rank_jobs(profile, jobs, top_k=settings["top_k"])
@@ -445,7 +496,8 @@ def execute_match_workflow(settings: dict[str, Any], jobs: list[dict[str, Any]])
             co_audited = []
             for j in co_ranked:
                 rep = EvidenceGrounder.audit_match(profile, j)
-                co_audited.append({"job": j, "audit": rep})
+                explanation = reasoning_agent.explain(profile, j, float(j["match_score"]))
+                co_audited.append({"job": j, "audit": rep, "explanation": explanation})
 
             st.session_state.arena_results = {
                 "human": h_ranked,
@@ -536,11 +588,14 @@ def render_tab1_recommendations() -> None:
             for item in arena["codesign"]:
                 j = item["job"]
                 rep = item["audit"]
+                exp = item.get("explanation")
                 with st.container(border=True):
                     st.write(f"**Rank {j['match_rank']}: {j['title']}**")
                     st.caption(f"{j['company']} · {j['location']}")
                     st.metric("Score", f"{int(j['match_score']*100)}%", help=f"BM25: {j.get('bm25_score')}, Dense: {j.get('dense_score')}")
                     st.success(f"Verified Skills: {len(rep.verified_skills)} | Gaps: {len(rep.skill_gaps)}")
+                    if exp:
+                        st.caption(f"🧠 **{exp.source}**: {exp.summary[:100]}…")
 
         return
 
@@ -585,6 +640,23 @@ def render_tab1_recommendations() -> None:
                 for g in audit.skill_gaps:
                     tags_html += f'<span class="evidence-tag tag-gap">✗ Gap: {escape(g)}</span>'
                 st.markdown(tags_html, unsafe_allow_html=True)
+
+                exp = item.get("explanation")
+                if exp:
+                    with st.expander(f"🧠 AI Fit Analysis & Action Plan ({exp.source})", expanded=True):
+                        st.markdown(f"**Analysis Summary:** {exp.summary}")
+                        c_str, c_gap = st.columns(2)
+                        with c_str:
+                            st.markdown("**Identified Strengths:**")
+                            for strength in exp.matched_strengths:
+                                st.markdown(f"- ✅ {strength}")
+                        with c_gap:
+                            st.markdown("**Skill Gaps & Opportunities:**")
+                            for gap in exp.skill_gaps:
+                                st.markdown(f"- ⚠️ {gap}")
+                        st.info(f"💡 **Recommended Next Step:** {exp.next_step}")
+                        if exp.warning:
+                            st.caption(f"ℹ️ {exp.warning}")
 
                 with st.expander("Inspect Full Job Description & Responsibilities"):
                     st.write(job["description"])
