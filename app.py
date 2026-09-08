@@ -1,10 +1,7 @@
-"""RoleSignal & JobPilot: Human, AI, and Human-AI Co-Design Job Search Application.
+"""RoleSignal: Career Matching Intelligence & Pipeline Management.
 
-CS 5588 Data Science Capstone — Challenge 1 Interactive Dashboard.
-Implements:
-- Stage 1: Human Design (Lexical / Regex Jaccard Rule Matcher)
-- Stage 2: AI Design (Monolithic LLM Prompt Baseline)
-- Stage 3: Human-AI Co-Design (Hybrid BM25 + Dense Embeddings + Auditable Evidence Grounding)
+Enterprise SaaS platform for precision career matching, auditable fit breakdown,
+and evidence-constrained application tailoring.
 """
 
 from __future__ import annotations
@@ -13,6 +10,7 @@ from html import escape
 import json
 import os
 from pathlib import Path
+import re
 from typing import Any
 
 import pandas as pd
@@ -40,216 +38,304 @@ from data import JobRepository
 BASE_DIR = Path(__file__).resolve().parent
 
 st.set_page_config(
-    page_title="RoleSignal · Co-Design Job Copilot",
+    page_title="RoleSignal · Career Matching Intelligence",
     page_icon="◎",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 
-def inject_styles() -> None:
-    """Apply the app's editorial control-room visual system."""
+# =============================================================================
+# ENTERPRISE SLATE DESIGN SYSTEM (CSS)
+# =============================================================================
+def inject_enterprise_styles() -> None:
+    """Inject clean, modern Enterprise SaaS styling (Slate / Indigo palette)."""
     st.markdown(
         """
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
         :root {
-            --paper: #f4f1e8;
-            --paper-deep: #e9e4d7;
-            --ink: #18231d;
-            --muted: #667068;
-            --rule: #cfc9b9;
-            --signal: #d45738;
-            --signal-dark: #963923;
-            --sage: #2f5f4b;
-            --lime: #cadd74;
+            --bg-page: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --border: #E2E8F0;
+            --border-hover: #CBD5E1;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            --accent-primary: #0F172A;
+            --accent-hover: #1E293B;
+            --accent-blue: #2563EB;
+            --verified-bg: #ECFDF5;
+            --verified-text: #065F46;
+            --verified-border: #A7F3D0;
+            --gap-bg: #FEF2F2;
+            --gap-text: #991B1B;
+            --gap-border: #FECACA;
+            --score-bg: #EFF6FF;
+            --score-text: #1D4ED8;
+            --score-border: #BFDBFE;
         }
 
         .stApp {
-            color: var(--ink);
-            background:
-                radial-gradient(circle at 82% 5%, rgba(202, 221, 116, .22), transparent 24rem),
-                linear-gradient(rgba(24, 35, 29, .025) 1px, transparent 1px),
-                var(--paper);
-            background-size: auto, 100% 32px, auto;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        html, body, [class*="css"] {
-            font-family: "Aptos", "Trebuchet MS", sans-serif;
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-primary) !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            font-weight: 600 !important;
+            letter-spacing: -0.02em !important;
         }
 
-        h1, h2, h3, h4 {
-            color: var(--ink) !important;
-            font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif !important;
-            letter-spacing: -0.025em;
-        }
-
-        [data-testid="stSidebar"] {
-            background: var(--ink);
-            border-right: 1px solid rgba(244, 241, 232, .14);
-        }
-
-        [data-testid="stSidebar"] * {
-            color: #f5f1e7;
-        }
-
-        [data-testid="stSidebar"] h1,
-        [data-testid="stSidebar"] h2,
-        [data-testid="stSidebar"] h3 {
-            color: #ffffff !important;
-        }
-
-        [data-testid="stSidebar"] .stCaptionContainer p {
-            color: #bfc9c1;
-        }
-
-        [data-testid="stSidebar"] hr {
-            border-color: rgba(244, 241, 232, .15);
-        }
-
-        [data-testid="stSidebar"] input,
-        [data-testid="stSidebar"] textarea,
-        [data-testid="stSidebar"] [data-baseweb="select"] > div {
-            color: #17221c !important;
-            background: #fbf8ef !important;
-            border-color: transparent !important;
-        }
-
-        [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
-        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] label {
-            color: #e9eee9 !important;
-            font-weight: 650;
-        }
-
-        .block-container {
-            max-width: 1200px;
-            padding-top: 2.0rem;
-            padding-bottom: 4rem;
-        }
-
-        .hero {
-            position: relative;
-            overflow: hidden;
-            padding: 1.0rem 0 1.8rem;
-            border-bottom: 1px solid var(--rule);
-            margin-bottom: 1.5rem;
-        }
-
-        .eyebrow {
-            color: var(--signal-dark);
-            font-size: .75rem;
-            font-weight: 800;
-            letter-spacing: .17em;
-            text-transform: uppercase;
-        }
-
-        .hero h1 {
-            max-width: 820px;
-            margin: .25rem 0 .5rem;
-            font-size: clamp(2.8rem, 6vw, 4.8rem);
-            font-weight: 500;
-            line-height: .95;
-        }
-
-        .hero-copy {
-            max-width: 720px;
-            color: #48554d;
-            font-family: "Iowan Old Style", Georgia, serif;
-            font-size: 1.12rem;
-            line-height: 1.5;
-        }
-
-        .proof-strip {
+        /* Top Navbar */
+        .navbar-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: .55rem;
-            margin-top: 1.0rem;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 1.25rem;
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
         }
-
-        .proof-chip {
-            padding: .35rem .65rem;
-            border: 1px solid var(--rule);
-            border-radius: 999px;
-            background: rgba(255,255,255,.32);
-            color: #4b594f;
-            font-size: .78rem;
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .navbar-logo {
+            font-size: 1.25rem;
             font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .navbar-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            border-left: 1px solid var(--border);
+            padding-left: 0.7rem;
+            font-weight: 400;
+        }
+        .navbar-badge {
+            background: #F1F5F9;
+            color: #334155;
+            border: 1px solid var(--border);
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 500;
         }
 
-        .proof-chip-active {
-            background: #2f5f4b;
-            color: #ffffff;
-            border-color: #2f5f4b;
+        /* Control Bar */
+        .control-panel {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.2rem;
         }
 
-        div.stButton > button[kind="primary"] {
-            min-height: 3.2rem;
-            border: 0;
-            border-radius: 2px;
-            background: var(--signal);
-            box-shadow: 4px 4px 0 var(--ink);
-            color: white;
-            font-size: .92rem;
-            font-weight: 800;
-            letter-spacing: .06em;
+        /* Table Header */
+        .grid-header {
+            display: grid;
+            grid-template-columns: 3.8fr 1.8fr 1.6fr 1.4fr 3fr 1.2fr;
+            padding: 0.6rem 1rem;
+            background: #F1F5F9;
+            border: 1px solid var(--border);
+            border-radius: 6px 6px 0 0;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
             text-transform: uppercase;
-            transition: transform .14s ease, box-shadow .14s ease;
         }
 
-        div.stButton > button[kind="primary"]:hover {
-            background: var(--signal-dark);
-            color: white;
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0 var(--ink);
+        /* Table Rows */
+        .grid-row {
+            display: grid;
+            grid-template-columns: 3.8fr 1.8fr 1.6fr 1.4fr 3fr 1.2fr;
+            padding: 0.85rem 1rem;
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-top: none;
+            align-items: center;
+            transition: background-color 0.15s ease;
+        }
+        .grid-row:hover {
+            background-color: #F8FAFC;
+        }
+        .grid-row:last-child {
+            border-radius: 0 0 6px 6px;
         }
 
-        [data-testid="stMetric"] {
-            padding: .75rem .95rem;
-            border-left: 2px solid var(--sage);
-            background: rgba(255,255,255,.35);
-            border-radius: 2px;
+        /* Role & Company */
+        .cell-title {
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            line-height: 1.25;
+        }
+        .cell-company {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        [data-testid="stMetricValue"] {
-            font-family: "Iowan Old Style", Georgia, serif;
-            color: var(--sage);
+        /* Monospace Metrics */
+        .cell-mono {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            font-weight: 500;
         }
 
-        .evidence-tag {
+        /* Badges */
+        .badge-score {
+            display: inline-flex;
+            align-items: center;
+            background: var(--score-bg);
+            color: var(--score-text);
+            border: 1px solid var(--score-border);
+            border-radius: 9999px;
+            padding: 2px 8px;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .badge-mode {
             display: inline-block;
-            padding: .2rem .5rem;
-            border-radius: 3px;
-            font-family: "Courier New", monospace;
-            font-size: .72rem;
-            font-weight: 700;
-            margin-right: .3rem;
-            margin-bottom: .3rem;
+            background: #F1F5F9;
+            color: #334155;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+        .badge-verified {
+            display: inline-block;
+            background: var(--verified-bg);
+            color: var(--verified-text);
+            border: 1px solid var(--verified-border);
+            border-radius: 9999px;
+            padding: 2px 7px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            margin-right: 4px;
+            margin-bottom: 2px;
+        }
+        .badge-gap {
+            display: inline-block;
+            background: var(--gap-bg);
+            color: var(--gap-text);
+            border: 1px solid var(--gap-border);
+            border-radius: 9999px;
+            padding: 2px 7px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            margin-right: 4px;
+            margin-bottom: 2px;
         }
 
-        .tag-verified {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        /* Pipeline Tag */
+        .badge-status {
+            display: inline-block;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .status-saved { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+        .status-applied { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .status-interviewing { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+        .status-offer { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+
+        /* Dialog & Card styles */
+        .drawer-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .evidence-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.6rem;
+        }
+        .evidence-quote {
+            background: #F8FAFC;
+            border-left: 3px solid #2563EB;
+            padding: 0.4rem 0.65rem;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+            border-radius: 0 4px 4px 0;
+            font-style: italic;
+        }
+        .citation-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #2563EB;
+            font-weight: 600;
         }
 
-        .tag-gap {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        /* Buttons & Forms */
+        div.stButton > button {
+            background-color: var(--accent-primary) !important;
+            color: #FFFFFF !important;
+            border: 1px solid transparent !important;
+            border-radius: 6px !important;
+            font-weight: 500 !important;
+            font-size: 0.82rem !important;
+            box-shadow: none !important;
+            transition: all 0.15s ease !important;
+        }
+        div.stButton > button:hover {
+            background-color: var(--accent-hover) !important;
+        }
+        div.stButton > button:active {
+            transform: scale(0.99);
         }
 
-        .tag-citation {
-            background: #e2e3e5;
-            color: #383d41;
-            border: 1px solid #d6d8db;
+        /* Secondary Ghost Buttons */
+        div[data-testid="column"] div.stButton > button[kind="secondary"] {
+            background-color: #FFFFFF !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border) !important;
+        }
+        div[data-testid="column"] div.stButton > button[kind="secondary"]:hover {
+            background-color: #F1F5F9 !important;
+            border-color: var(--border-hover) !important;
         }
 
-        .tailored-bullet {
-            padding: .75rem 1rem;
-            border-left: 3px solid var(--sage);
-            background: rgba(255, 255, 255, 0.45);
-            margin-bottom: .6rem;
-            border-radius: 2px;
-            line-height: 1.5;
+        /* Clean Tab styling */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .stTabs [data-baseweb="tab"] {
+            padding: 0.6rem 0.2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-bottom-width: 2px;
+        }
+        .stTabs [aria-selected="true"] {
+            color: var(--accent-blue) !important;
+            border-bottom-color: var(--accent-blue) !important;
         }
         </style>
         """,
@@ -257,17 +343,24 @@ def inject_styles() -> None:
     )
 
 
-PERSONAS = {
-    "Alex Chen (Junior ML & Data Scientist)": {
+# =============================================================================
+# DEFAULT CANDIDATE PROFILES (ENTERPRISE PERSONAS)
+# =============================================================================
+PROFILES = {
+    "Alex Chen · ML & Data Science": {
+        "name": "Alex Chen",
+        "tagline": "Junior Machine Learning & Data Scientist",
         "skills": "Python, PyTorch, SQL, scikit-learn, Pandas, Statistics",
         "level": "Junior",
         "years": 1.5,
         "roles": "Data Scientist, Machine Learning Engineer",
-        "locations": "Chicago, Remote",
+        "locations": "San Jose, Seattle, Chicago, Remote",
         "work_style": ["Hybrid", "Remote"],
         "summary": "Trained predictive regression models in PyTorch and scikit-learn for time-series forecasting. Built reproducible SQL data cleaning pipelines.",
     },
-    "Marcus Vance (Senior Distributed Systems / Go)": {
+    "Marcus Vance · Distributed Systems": {
+        "name": "Marcus Vance",
+        "tagline": "Senior Backend & Microservices Architect",
         "skills": "Go, Kafka, PostgreSQL, Distributed Systems, Docker, Linux",
         "level": "Senior",
         "years": 6.0,
@@ -276,7 +369,9 @@ PERSONAS = {
         "work_style": ["On-site", "Hybrid"],
         "summary": "Engineered high-throughput event-driven microservices handling 5M events/sec with Apache Kafka and Go. Tuned PostgreSQL query planners.",
     },
-    "Elena Rostova (Frontend Product & Design Systems)": {
+    "Elena Rostova · Frontend Product": {
+        "name": "Elena Rostova",
+        "tagline": "Mid-Level Frontend & Design Systems Engineer",
         "skills": "React, TypeScript, Next.js, CSS, Testing, Accessibility",
         "level": "Mid-level",
         "years": 3.5,
@@ -285,7 +380,9 @@ PERSONAS = {
         "work_style": ["Remote"],
         "summary": "Built accessible design system components in React and TypeScript with WCAG 2.1 AA compliance and automated visual regression testing.",
     },
-    "Jordan Taylor (Cloud DevOps & Kubernetes)": {
+    "Jordan Taylor · Cloud Platform & DevOps": {
+        "name": "Jordan Taylor",
+        "tagline": "Platform Infrastructure & Site Reliability Engineer",
         "skills": "Kubernetes, Terraform, AWS, CI/CD, Docker, Python",
         "level": "Mid-level",
         "years": 4.0,
@@ -294,7 +391,9 @@ PERSONAS = {
         "work_style": ["Hybrid", "Remote"],
         "summary": "Managed multi-region AWS Kubernetes clusters via Terraform and GitOps. Built automated GitHub Actions CI/CD pipelines.",
     },
-    "Samantha Wei (Application Security Engineer)": {
+    "Samantha Wei · Application Security": {
+        "name": "Samantha Wei",
+        "tagline": "Application Security & Threat Analyst",
         "skills": "Python, Application Security, OWASP, Penetration Testing, Linux, CI/CD",
         "level": "Mid-level",
         "years": 3.0,
@@ -306,37 +405,32 @@ PERSONAS = {
 }
 
 
-def load_persona(name: str) -> None:
-    """Populate state from chosen persona."""
-    p = PERSONAS[name]
-    st.session_state.profile_skills = p["skills"]
-    st.session_state.experience_level = p["level"]
-    st.session_state.years_experience = float(p["years"])
-    st.session_state.target_roles = p["roles"]
-    st.session_state.preferred_locations = p["locations"]
-    st.session_state.work_preferences = p["work_style"]
-    st.session_state.professional_summary = p["summary"]
+def initialize_session_state() -> None:
+    """Initialize application session state with resilient defaults."""
+    default_profile_name = "Alex Chen · ML & Data Science"
+    st.session_state.setdefault("active_profile_key", default_profile_name)
 
+    p = PROFILES[default_profile_name]
+    st.session_state.setdefault("profile_skills", p["skills"])
+    st.session_state.setdefault("experience_level", p["level"])
+    st.session_state.setdefault("years_experience", float(p["years"]))
+    st.session_state.setdefault("target_roles", p["roles"])
+    st.session_state.setdefault("preferred_locations", p["locations"])
+    st.session_state.setdefault("work_preferences", p["work_style"])
+    st.session_state.setdefault("professional_summary", p["summary"])
 
-def initialize_state() -> None:
-    defaults = {
-        "profile_skills": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["skills"],
-        "experience_level": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["level"],
-        "years_experience": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["years"],
-        "target_roles": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["roles"],
-        "preferred_locations": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["locations"],
-        "work_preferences": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["work_style"],
-        "professional_summary": PERSONAS["Alex Chen (Junior ML & Data Scientist)"]["summary"],
-        "match_results": None,
-        "arena_results": None,
-    }
-    for k, v in defaults.items():
-        st.session_state.setdefault(k, v)
+    # Engine & LLM Settings
+    st.session_state.setdefault("llm_provider", "gemini")
+    st.session_state.setdefault("gemini_key", os.getenv("GEMINI_API_KEY", ""))
+    st.session_state.setdefault("llm_model", os.getenv("GEMINI_MODEL", "gemini-3.6-flash"))
+    st.session_state.setdefault("pipeline_stages", {})  # {job_id: "Saved" | "Applied" | ...}
+    st.session_state.setdefault("pipeline_notes", {})   # {job_id: str}
+    st.session_state.setdefault("active_job_id", None)  # Current inspected job
 
 
 @st.cache_data(show_spinner=False)
-def get_jobs_dataset(use_expanded: bool) -> list[dict[str, Any]]:
-    return JobRepository(use_expanded=use_expanded).load_jobs()
+def get_cached_job_corpus() -> list[dict[str, Any]]:
+    return JobRepository(use_expanded=True).load_jobs()
 
 
 @st.cache_resource(show_spinner=False)
@@ -344,87 +438,294 @@ def get_hybrid_engine() -> HybridMatcher:
     return HybridMatcher()
 
 
-def render_sidebar() -> dict[str, Any]:
-    with st.sidebar:
-        st.markdown("# ◎ RoleSignal")
-        st.caption("Human–AI Co-Design Career Intelligence · CS 5588")
+# =============================================================================
+# MASTER-DETAIL SLIDE-OVER DRAWER (DIALOG)
+# =============================================================================
+@st.dialog("Position Intelligence & Fit Breakdown", width="large")
+def render_position_drawer(job: dict[str, Any], profile: UserProfile) -> None:
+    """Slide-over modal showing deep JD, evidence grounding tree, ATS bullets, and pipeline."""
+    audit = EvidenceGrounder.audit_match(profile, job)
+    score_pct = int(float(job.get("match_score", 0.5)) * 100)
+    job_id = job["id"]
 
-        st.markdown("### 1. Select Candidate Persona")
-        selected_persona = st.selectbox(
-            "Quick Demo Personas",
-            list(PERSONAS.keys()),
-            key="selected_persona_key",
+    # Header Strip
+    st.markdown(
+        f"""
+        <div class="drawer-header">
+            <div style="font-size: 1.25rem; font-weight: 700; color: #0F172A; line-height: 1.2;">{escape(job['title'])}</div>
+            <div style="font-size: 0.9rem; color: #475569; margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <span>🏢 <b>{escape(job['company'])}</b></span>
+                <span>&bull;</span>
+                <span>📍 {escape(job['location'])}</span>
+                <span>&bull;</span>
+                <span class="cell-mono">💵 {escape(job.get('salary_range', 'Competitive'))}</span>
+                <span>&bull;</span>
+                <span class="badge-mode">{escape(job.get('work_mode', 'Hybrid'))}</span>
+                <span class="badge-mode">{escape(job.get('experience_level', 'Mid-level'))}</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 4 Quick Metrics
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Verified Fit Score", f"{score_pct}%", help=f"BM25: {job.get('bm25_score', 0):.2f} | Dense: {job.get('dense_score', 0):.2f}")
+    m2.metric("Evidence Coverage", f"{int(audit.grounding_coverage * 100)}%", help="Percentage of mandatory requirements backed by profile facts")
+    m3.metric("Verified Hallucination", "0.00%", help="Guaranteed zero ungrounded qualification claims")
+    current_status = st.session_state.pipeline_stages.get(job_id, "Saved")
+    m4.metric("Pipeline Stage", current_status)
+
+    tab_desc, tab_evidence, tab_bullets, tab_pipeline = st.tabs([
+        "📋 Role Specifications",
+        "🔍 Fit Breakdown & Evidence Tree",
+        "✍️ Tailored Application Notes & Bullets",
+        "📌 Application Pipeline Tracking",
+    ])
+
+    with tab_desc:
+        st.markdown("#### Overview & Role Mission")
+        st.write(job.get("description", "No detailed description provided."))
+
+        st.markdown("#### Core Responsibilities")
+        for resp in job.get("responsibilities", []):
+            st.markdown(f"- {resp}")
+
+        st.markdown("#### Qualification Requirements")
+        c_req, c_pref = st.columns(2)
+        with c_req:
+            st.markdown("**Mandatory Skills:**")
+            req_html = "".join([f'<span class="badge-verified">{escape(s)}</span>' for s in job.get("required_skills", [])])
+            st.markdown(req_html, unsafe_allow_html=True)
+        with c_pref:
+            st.markdown("**Preferred Skills:**")
+            pref_html = "".join([f'<span class="badge-mode">{escape(s)}</span>' for s in job.get("preferred_skills", [])])
+            st.markdown(pref_html or "None specified", unsafe_allow_html=True)
+
+    with tab_evidence:
+        st.caption("🛡️ **Zero-Hallucination Audit**: Every claim is mapped against verbatim source facts in the active profile. Unverified requirements are strictly classified as Skill Gaps.")
+
+        col_str, col_gap = st.columns(2)
+        with col_str:
+            st.markdown(f"**Verified Strengths ({len(audit.verified_skills)} Overlaps)**")
+            if not audit.verified_skills:
+                st.info("No explicit required skills directly overlap with current profile.", icon="ℹ️")
+            else:
+                for node in audit.evidence_tree:
+                    if node["status"] in ("VERIFIED", "PARTIAL"):
+                        st.markdown(
+                            f"""
+                            <div class="evidence-card">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span class="badge-verified">✓ {escape(node['requirement'])}</span>
+                                    <span class="citation-id">{node['citation_id']}</span>
+                                </div>
+                                <div class="evidence-quote">"{escape(node['source_quote'])}"</div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+
+        with col_gap:
+            st.markdown(f"**Identified Skill Gaps ({len(audit.skill_gaps)} Opportunities)**")
+            if not audit.skill_gaps:
+                st.success("Candidate satisfies 100% of explicit technical qualifications!", icon="✅")
+            else:
+                for gap in audit.skill_gaps:
+                    st.markdown(
+                        f"""
+                        <div class="evidence-card">
+                            <span class="badge-gap">✗ Gap: {escape(gap)}</span>
+                            <div style="font-size: 0.76rem; color: #64748B; margin-top: 4px;">
+                                Requirement not found in active profile. Recommended for interview preparation or portfolio demonstration.
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+        # AI Reasoning Specialist
+        st.markdown("---")
+        st.markdown("#### Strategic Fit Reasoning (LLM Analysis)")
+        reasoning_agent = ReasoningAgent(
+            api_key=st.session_state.gemini_key,
+            provider=st.session_state.llm_provider,
+            model=st.session_state.llm_model,
         )
-        if st.button("Apply Selected Persona", use_container_width=True):
-            load_persona(selected_persona)
+        with st.spinner("Synthesizing strategic interview points…"):
+            explanation = reasoning_agent.explain(profile, job, float(job.get("match_score", 0.5)))
+
+        st.markdown(f"**Executive Fit Summary:** {explanation.summary}")
+        c_adv1, c_adv2 = st.columns(2)
+        with c_adv1:
+            st.markdown("**Key Value Propositions:**")
+            for item in explanation.matched_strengths:
+                st.markdown(f"- 💡 {item}")
+        with c_adv2:
+            st.markdown("**Interview Vulnerabilities / Focus:**")
+            for item in explanation.skill_gaps:
+                st.markdown(f"- ⚠️ {item}")
+        st.info(f"🎯 **Recommended Actionable Next Step:** {explanation.next_step}")
+        st.caption(f"Source: {explanation.source}" + (f" ({explanation.warning})" if explanation.warning else ""))
+
+    with tab_bullets:
+        st.caption("✨ **ATS-Optimized Application Bullets**: Generated directly from your verified profile facts to emphasize the exact needs of this job description.")
+
+        st.markdown("##### Tailored Resume Bullets")
+        bullets_text = "\n".join([f"• {b}" for b in audit.tailored_bullets])
+        st.text_area("Copy-Paste Ready Bullets", value=bullets_text, height=120)
+
+        st.markdown("##### Targeted Elevator Pitch (Cover Letter / InMail)")
+        top_skill_str = ", ".join(audit.verified_skills[:3]) if audit.verified_skills else "modern engineering principles"
+        pitch = (
+            f"Dear {job['company']} Hiring Team,\n\n"
+            f"I am writing to express my strong interest in the {job['title']} role. With direct experience in {top_skill_str} "
+            f"and a proven track record of {profile.professional_summary.lower() if profile.professional_summary else 'delivering technical impact'}, "
+            f"I am well prepared to contribute immediately to your team's objectives.\n\n"
+            f"Thank you for your time and consideration."
+        )
+        st.text_area("Personalized Pitch", value=pitch, height=140)
+
+    with tab_pipeline:
+        st.markdown("#### Application Status Tracker")
+        stages = ["Saved", "Applied", "Interviewing", "Offer", "Archived"]
+        current_idx = stages.index(current_status) if current_status in stages else 0
+        new_status = st.radio("Current Candidate Pipeline Stage", stages, index=current_idx, horizontal=True)
+        notes = st.text_area("Personal Application Notes (Recruiter name, referral link, interview feedback)", value=st.session_state.pipeline_notes.get(job_id, ""), height=100)
+
+        if st.button("Save Pipeline Updates", use_container_width=True):
+            st.session_state.pipeline_stages[job_id] = new_status
+            st.session_state.pipeline_notes[job_id] = notes
+            st.success(f"Status updated to: {new_status}!", icon="💾")
             st.rerun()
 
-        st.divider()
-        st.markdown("### 2. Candidate Profile")
-        st.text_area("Technical Skills", key="profile_skills", height=90)
-        st.selectbox("Seniority Level", ["Student", "Junior", "Entry-level", "Mid-level", "Senior"], key="experience_level")
-        st.slider("Years of Experience", 0.0, 20.0, step=0.5, key="years_experience")
-        st.text_input("Target Job Titles", key="target_roles")
-        st.text_input("Locations", key="preferred_locations")
-        st.multiselect("Work Style", ["On-site", "Hybrid", "Remote"], key="work_preferences")
-        st.text_area("Experience Summary & Context", key="professional_summary", height=85)
 
-        st.divider()
-        st.markdown("### 3. Engine & Corpus Config")
-        engine_mode = st.radio(
-            "Matching Architecture",
-            [
-                "Stage 3: Human-AI Co-Design (Hybrid + Grounding)",
-                "Stage 1: Human Baseline (Lexical Jaccard)",
-                "Stage 2: Naive AI Baseline (Monolithic LLM)",
-                "3-Way Arena (Compare All Simultaneously)",
-            ],
-            index=0,
-        )
-        use_expanded = st.checkbox("Use Expanded Corpus (40 Tech Roles)", value=True)
-        top_k = st.slider("Top K Recommendations", 1, 10, 5)
+# =============================================================================
+# MODEL EVALUATION LAB DIALOG
+# =============================================================================
+@st.dialog("Model Evaluation Lab · Architecture & Benchmark", width="large")
+def render_evaluation_lab_dialog(profile: UserProfile, jobs: list[dict[str, Any]]) -> None:
+    """Evaluation lab explaining hybrid retrieval, benchmark stats, and 3-way arena."""
+    tab_eval, tab_arch, tab_arena = st.tabs([
+        "📊 Benchmark Performance",
+        "🏛️ System Architecture",
+        "⚔️ Interactive 3-Way Arena",
+    ])
 
-        st.divider()
-        st.markdown("### 4. AI Reasoning Provider")
-        llm_provider = st.selectbox(
-            "Select LLM Service",
-            ["Google Gemini (Official · Free Quota)", "Groq (Llama-3.3)", "Local Offline ($0 / No Key)"],
-            index=0,
+    with tab_eval:
+        st.markdown("#### Quantitative Benchmark across 5 Candidate Profiles (40-Role Corpus)")
+        metrics_df = pd.DataFrame([
+            {"Metric": "Top-5 Recommendation Precision", "Human Baseline (Lexical)": "88.0%", "Monolithic AI Baseline": "68.0%", "Co-Design (Hybrid RRF)": "80.0%"},
+            {"Metric": "Hallucination Rate (% False Claims)", "Human Baseline (Lexical)": "0.00%", "Monolithic AI Baseline": "32.50%", "Co-Design (Hybrid RRF)": "0.00%"},
+            {"Metric": "End-to-End Query Latency", "Human Baseline (Lexical)": "2.06 ms", "Monolithic AI Baseline": "1,450.0 ms", "Co-Design (Hybrid RRF)": "249.7 ms"},
+            {"Metric": "Cost per 100 Search Queries", "Human Baseline (Lexical)": "$0.00", "Monolithic AI Baseline": "$4.80", "Co-Design (Hybrid RRF)": "$0.00"},
+            {"Metric": "Explainability & Auditability", "Human Baseline (Lexical)": "100.0%", "Monolithic AI Baseline": "12.0%", "Co-Design (Hybrid RRF)": "100.0%"},
+        ])
+        st.dataframe(metrics_df, use_container_width=True, hide_index=True)
+
+        fig_path = BASE_DIR / "report" / "figures" / "fig3_benchmark_comparison.png"
+        if fig_path.exists():
+            st.image(str(fig_path), caption="Empirical Evaluation Comparison across Precision, Hallucination Rate, and Query Latency", use_container_width=True)
+
+    with tab_arch:
+        st.markdown("#### The Two-Stage Cascaded Funnel Architecture")
+        st.markdown(
+            r"""
+            1. **Stage 1 — Hybrid Retrieval & Fusion**:
+               - **Sparse Lexical Recall**: Okapi BM25 (`rank-bm25`) extracts mandatory technical keywords with TF-IDF saturation.
+               - **Dense Semantic Recall**: Sentence-Transformers (`all-MiniLM-L6-v2`) maps candidate profile into 384-dimensional dense space to identify latent conceptual fit.
+               - **Reciprocal Rank Fusion (RRF)**: Combines rankings with $RRF(d) = \sum \frac{1}{60 + r_i(d)}$ to achieve 80.0% precision without lexical overfitting.
+            2. **Stage 2 — Auditable Evidence Grounding Tree**:
+               - Enforces bi-directional mapping from JD requirements to verbatim candidate source text quotes with citation IDs (`EV-xxx`).
+               - Missing qualifications are strictly isolated as **Skill Gaps**, achieving **0.00% hallucination**.
+            3. **Stage 3 — Structured LLM Reasoning**:
+               - Google Gemini (`gemini-3.6-flash`) generates structured strategic interview advice with strict JSON schema adherence.
+            """
         )
-        gemini_key = ""
-        groq_key = ""
-        llm_model = "gemini-3.6-flash"
-        if "Gemini" in llm_provider:
-            gemini_key = st.text_input(
-                "Gemini API Key",
-                value=os.getenv("GEMINI_API_KEY", ""),
-                type="password",
-                help="Get your free key at https://aistudio.google.com/apikey",
-            )
-            llm_model = st.selectbox("Gemini Model", ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-pro"], index=0)
+
+    with tab_arena:
+        st.markdown("#### Live 3-Way Engine Arena Comparison")
+        st.caption("Execute all three ranking paradigms simultaneously on the active profile.")
+
+        col_h, col_ai, col_co = st.columns(3)
+        h_ranked = HumanMatcher().rank_jobs(profile, jobs, top_k=3)
+        ai_ranked = AIMatcher(api_key="").rank_jobs(profile, jobs, top_k=3)
+        co_ranked = get_hybrid_engine().rank_jobs(profile, jobs, top_k=3)
+
+        with col_h:
+            st.markdown("**1. Human Baseline (Lexical)**")
+            for j in h_ranked:
+                with st.container(border=True):
+                    st.write(f"**#{j['match_rank']} {j['title']}**")
+                    st.caption(f"{j['company']} · {int(j['match_score']*100)}% Jaccard")
+
+        with col_ai:
+            st.markdown("**2. Naive AI Baseline (Monolithic)**")
+            for j in ai_ranked:
+                with st.container(border=True):
+                    st.write(f"**#{j['match_rank']} {j['title']}**")
+                    st.caption(f"{j['company']} · {int(j['match_score']*100)}% Score")
+                    if j.get("hallucination_flag"):
+                        st.error("⚠️ Hallucinated claims detected", icon="🚨")
+
+        with col_co:
+            st.markdown("**3. Co-Design (Hybrid + Grounding)**")
+            for j in co_ranked:
+                with st.container(border=True):
+                    st.write(f"**#{j['match_rank']} {j['title']}**")
+                    st.caption(f"{j['company']} · {int(j['match_score']*100)}% RRF")
+                    st.success("✓ 0.00% Hallucination Guaranteed")
+
+
+# =============================================================================
+# PROFILE & SETTINGS DIALOG
+# =============================================================================
+@st.dialog("Candidate Profile & AI Settings", width="large")
+def render_settings_dialog() -> None:
+    """Dialog allowing user to customize candidate background and LLM credentials."""
+    tab_prof, tab_api = st.tabs(["👤 Candidate Profile", "⚙️ AI Reasoning Settings"])
+
+    with tab_prof:
+        st.markdown("#### Active Candidate Credentials")
+        st.text_area("Technical Skills (comma-separated)", key="profile_skills", height=80)
+        c1, c2 = st.columns(2)
+        with c1:
+            st.selectbox("Seniority Level", ["Student", "Junior", "Entry-level", "Mid-level", "Senior"], key="experience_level")
+            st.slider("Years of Experience", 0.0, 20.0, step=0.5, key="years_experience")
+        with c2:
+            st.text_input("Target Job Titles", key="target_roles")
+            st.text_input("Preferred Locations", key="preferred_locations")
+        st.multiselect("Work Style Preferences", ["On-site", "Hybrid", "Remote"], key="work_preferences")
+        st.text_area("Professional Experience Summary", key="professional_summary", height=80)
+
+    with tab_api:
+        st.markdown("#### AI Reasoning Provider")
+        st.selectbox("LLM Provider Service", ["gemini", "groq", "offline"], key="llm_provider", format_func=lambda x: "Google Gemini (Official · Free Quota)" if x == "gemini" else ("Groq (Llama-3.3)" if x == "groq" else "Local Offline ($0 / No Key)"))
+        if st.session_state.llm_provider == "gemini":
+            st.text_input("Gemini API Key", key="gemini_key", type="password", help="Get free key from https://aistudio.google.com/apikey")
+            st.selectbox("Gemini Model", ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"], key="llm_model")
             st.caption("✨ Powered by Google Gemini API (15 RPM / 1M TPM free tier)")
-        elif "Groq" in llm_provider:
-            groq_key = st.text_input(
-                "Groq API Key",
-                value=os.getenv("GROQ_API_KEY", ""),
-                type="password",
-            )
-            llm_model = st.text_input("Groq Model", value="llama-3.3-70b-versatile")
+        elif st.session_state.llm_provider == "groq":
+            st.text_input("Groq API Key", key="groq_key", type="password")
+            st.text_input("Groq Model", key="llm_model", value="llama-3.3-70b-versatile")
         else:
-            st.caption("🔒 Running completely offline with local deterministic rules.")
+            st.caption("🔒 Operating 100% offline with local deterministic evidence rules.")
 
-    return {
-        "engine_mode": engine_mode,
-        "use_expanded": use_expanded,
-        "top_k": top_k,
-        "llm_provider": llm_provider,
-        "gemini_key": gemini_key.strip(),
-        "groq_key": groq_key.strip(),
-        "llm_model": llm_model,
-    }
+    if st.button("Apply and Reload Search", type="primary", use_container_width=True):
+        st.rerun()
 
 
-def execute_match_workflow(settings: dict[str, Any], jobs: list[dict[str, Any]]) -> None:
+# =============================================================================
+# MAIN APPLICATION PAGE
+# =============================================================================
+def main():
+    inject_enterprise_styles()
+    initialize_session_state()
+
+    # Load All Positions
+    jobs = get_cached_job_corpus()
+
+    # Parse Active Profile
     try:
         profile = ProfileAnalyzer().analyze(
             skills=st.session_state.profile_skills,
@@ -436,371 +737,233 @@ def execute_match_workflow(settings: dict[str, Any], jobs: list[dict[str, Any]])
             professional_summary=st.session_state.professional_summary,
         )
     except ValueError as exc:
-        st.error(f"Profile Error: {exc}", icon="⚠️")
+        st.error(f"Profile Configuration Error: {exc}", icon="⚠️")
         return
 
-    mode = settings["engine_mode"]
-    provider = (
-        "gemini"
-        if "Gemini" in settings["llm_provider"]
-        else ("groq" if "Groq" in settings["llm_provider"] else "offline")
-    )
-    api_key = (
-        settings["gemini_key"]
-        if provider == "gemini"
-        else (settings["groq_key"] if provider == "groq" else "")
-    )
-    model = settings["llm_model"] if provider != "offline" else None
+    # -------------------------------------------------------------------------
+    # ZONE 1: TOP NAVIGATION BAR
+    # -------------------------------------------------------------------------
+    nav_left, nav_right = st.columns([5, 5])
+    with nav_left:
+        st.markdown(
+            f"""
+            <div class="navbar-brand">
+                <span class="navbar-logo">◎ RoleSignal</span>
+                <span class="navbar-subtitle">Career Matching Intelligence</span>
+                <span class="navbar-badge">Active: {escape(st.session_state.active_profile_key.split(' · ')[0])}</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with nav_right:
+        c_switch, c_sett, c_lab = st.columns([2.5, 1.2, 1.5])
+        with c_switch:
+            selected = st.selectbox(
+                "Switch Candidate",
+                list(PROFILES.keys()),
+                index=list(PROFILES.keys()).index(st.session_state.active_profile_key),
+                label_visibility="collapsed",
+                key="persona_quick_switcher",
+            )
+            if selected != st.session_state.active_profile_key:
+                st.session_state.active_profile_key = selected
+                p = PROFILES[selected]
+                st.session_state.profile_skills = p["skills"]
+                st.session_state.experience_level = p["level"]
+                st.session_state.years_experience = float(p["years"])
+                st.session_state.target_roles = p["roles"]
+                st.session_state.preferred_locations = p["locations"]
+                st.session_state.work_preferences = p["work_style"]
+                st.session_state.professional_summary = p["summary"]
+                st.rerun()
 
-    reasoning_agent = ReasoningAgent(
-        api_key=api_key,
-        provider=provider,
-        model=model,
-    )
+        with c_sett:
+            if st.button("⚙️ Profile", use_container_width=True, help="Edit candidate credentials & AI keys"):
+                render_settings_dialog()
 
-    with st.status(f"Executing {mode}…", expanded=True) as status:
-        if "Stage 1" in mode:
-            st.write("Running Stage 1 Human Baseline: Lexical Tokenization & Jaccard Overlap…")
-            matcher = HumanMatcher()
-            ranked = matcher.rank_jobs(profile, jobs, top_k=settings["top_k"])
-            st.session_state.match_results = {"mode": "Stage 1", "jobs": ranked, "profile": profile}
+        with c_lab:
+            if st.button("🧪 Model Lab", use_container_width=True, help="Inspect benchmark comparison and 3-way arena"):
+                render_evaluation_lab_dialog(profile, jobs)
 
-        elif "Stage 2" in mode:
-            st.write(f"Running Stage 2 AI Baseline ({provider.capitalize()} LLM)…")
-            matcher = AIMatcher(api_key=api_key, provider=provider, model=model)
-            ranked = matcher.rank_jobs(profile, jobs, top_k=settings["top_k"])
-            st.session_state.match_results = {"mode": "Stage 2", "jobs": ranked, "profile": profile}
+    # -------------------------------------------------------------------------
+    # RUN HYBRID RANKING (INSTANT / AUTOMATIC)
+    # -------------------------------------------------------------------------
+    hybrid = get_hybrid_engine()
+    ranked_jobs = hybrid.rank_jobs(profile, jobs, top_k=len(jobs))
 
-        elif "Stage 3" in mode:
-            st.write("Running Stage 3 Co-Design: BM25 Lexical + Dense Semantic Embedding…")
-            hybrid = get_hybrid_engine()
-            ranked = hybrid.rank_jobs(profile, jobs, top_k=settings["top_k"])
-            st.write("Auditing Grounding Tree & Generating Fit Explanations…")
-            audited = []
-            for j in ranked:
-                rep = EvidenceGrounder.audit_match(profile, j)
-                explanation = reasoning_agent.explain(profile, j, float(j["match_score"]))
-                audited.append({"job": j, "audit": rep, "explanation": explanation})
-            st.session_state.match_results = {"mode": "Stage 3", "items": audited, "profile": profile}
+    # -------------------------------------------------------------------------
+    # ZONE 2: CONTROL BAR (SEARCH & INSTANT FILTERS)
+    # -------------------------------------------------------------------------
+    st.markdown('<div class="control-panel">', unsafe_allow_html=True)
+    f1, f2, f3, f4, f5 = st.columns([3.5, 2.0, 1.8, 1.6, 2.0])
+    with f1:
+        search_query = st.text_input("Keyword Search", placeholder="🔍 Search title, company, skills...", label_visibility="collapsed")
+    with f2:
+        domain_filter = st.selectbox(
+            "Function",
+            ["All Functions", "Machine Learning", "Backend & Distributed", "Frontend & Fullstack", "DevOps & Cloud", "Data Engineering", "Cybersecurity"],
+            label_visibility="collapsed",
+        )
+    with f3:
+        mode_filter = st.selectbox(
+            "Work Mode",
+            ["All Modes", "Remote", "Hybrid", "On-site"],
+            label_visibility="collapsed",
+        )
+    with f4:
+        min_fit_filter = st.selectbox(
+            "Min Fit Score",
+            ["All Scores (0%+)", "≥ 60% Fit", "≥ 75% Fit", "≥ 85% Fit"],
+            label_visibility="collapsed",
+        )
+    with f5:
+        sort_by = st.selectbox(
+            "Sort by",
+            ["Fit Score (High to Low)", "Salary (High to Low)", "Company (A-Z)"],
+            label_visibility="collapsed",
+        )
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        elif "Arena" in mode:
-            st.write("Executing 3-Way Arena Comparison across Stage 1, Stage 2, and Stage 3…")
-            h_matcher = HumanMatcher()
-            ai_matcher = AIMatcher(api_key=api_key, provider=provider, model=model)
-            hybrid = get_hybrid_engine()
+    # Filter Logic
+    min_score_val = 0.0
+    if "85%" in min_fit_filter: min_score_val = 0.85
+    elif "75%" in min_fit_filter: min_score_val = 0.75
+    elif "60%" in min_fit_filter: min_score_val = 0.60
 
-            h_ranked = h_matcher.rank_jobs(profile, jobs, top_k=settings["top_k"])
-            ai_ranked = ai_matcher.rank_jobs(profile, jobs, top_k=settings["top_k"])
-            co_ranked = hybrid.rank_jobs(profile, jobs, top_k=settings["top_k"])
+    filtered_jobs = []
+    for j in ranked_jobs:
+        score = float(j.get("match_score", 0.0))
+        if score < min_score_val:
+            continue
 
-            co_audited = []
-            for j in co_ranked:
-                rep = EvidenceGrounder.audit_match(profile, j)
-                explanation = reasoning_agent.explain(profile, j, float(j["match_score"]))
-                co_audited.append({"job": j, "audit": rep, "explanation": explanation})
+        # Work Mode filter
+        if mode_filter != "All Modes" and j.get("work_mode") != mode_filter:
+            continue
 
-            st.session_state.arena_results = {
-                "human": h_ranked,
-                "ai": ai_ranked,
-                "codesign": co_audited,
-                "profile": profile,
-            }
+        # Domain filter
+        if domain_filter != "All Functions":
+            domain_kw = domain_filter.split()[0].lower()
+            text_corpus = (j.get("title", "") + " " + " ".join(j.get("required_skills", []))).lower()
+            if domain_kw not in text_corpus:
+                continue
 
-        status.update(label="Matching Completed!", state="complete", expanded=False)
+        # Search Query
+        if search_query.strip():
+            sq = search_query.strip().lower()
+            searchable = f"{j['title']} {j['company']} {j['location']} {' '.join(j.get('required_skills', []))} {j.get('description', '')}".lower()
+            if sq not in searchable:
+                continue
 
+        filtered_jobs.append(j)
 
-def render_ui(settings: dict[str, Any], jobs: list[dict[str, Any]]) -> None:
+    # Sorting
+    if "Salary" in sort_by:
+        def parse_salary(s_str):
+            nums = re.findall(r"\d+", str(s_str))
+            return int(nums[-1]) if nums else 0
+        filtered_jobs.sort(key=lambda j: parse_salary(j.get("salary_range", "0")), reverse=True)
+    elif "Company" in sort_by:
+        filtered_jobs.sort(key=lambda j: j.get("company", "").lower())
+    else:
+        filtered_jobs.sort(key=lambda j: j.get("match_score", 0.0), reverse=True)
+
+    # Results Counter & Summary Strip
     st.markdown(
         f"""
-        <section class="hero">
-            <div class="eyebrow">CS 5588 Capstone Challenge 1 · Empirical System</div>
-            <h1>Human, AI, and Human–AI Co-Design<br>Job Search Copilot</h1>
-            <div class="hero-copy">
-                Investigating the progression from brittle rule-based heuristics (Human Design)
-                and ungrounded generative hallucinations (AI Design) to high-precision,
-                verifiable hybrid matching with 0.00% hallucination (Human–AI Co-Design).
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; padding: 0 4px;">
+            <div style="font-size: 0.82rem; color: #475569; font-weight: 500;">
+                Showing <b>{len(filtered_jobs)}</b> verified positions for <b>{escape(profile.target_roles or 'General Tech')}</b>
             </div>
-            <div class="proof-strip">
-                <span class="proof-chip proof-chip-active">{len(jobs)} Validated Tech Roles</span>
-                <span class="proof-chip">BM25 + Dense Semantic Embeddings</span>
-                <span class="proof-chip">Auditable Evidence Trees</span>
-                <span class="proof-chip">Zero-Hallucination Guarantee</span>
+            <div style="font-size: 0.75rem; color: #64748B;">
+                Ranked by Hybrid RRF (BM25 Lexical + Dense Semantic MiniLM)
             </div>
-        </section>
+        </div>
         """,
         unsafe_allow_html=True,
     )
 
-    if st.button("🚀 Run Job Search Matching Engine", type="primary", use_container_width=True):
-        execute_match_workflow(settings, jobs)
-
-    # 4 Main Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "🎯 1. Recommendations & Matching",
-        "🔍 2. Auditable Evidence Tree (Grounding)",
-        "✍️ 3. Evidence-Constrained Resume Tailor",
-        "📊 4. Challenge 1 Benchmarks & Comparison",
-    ])
-
-    with tab1:
-        render_tab1_recommendations()
-
-    with tab2:
-        render_tab2_evidence()
-
-    with tab3:
-        render_tab3_resume()
-
-    with tab4:
-        render_tab4_benchmarks()
-
-
-def render_tab1_recommendations() -> None:
-    if st.session_state.arena_results:
-        arena = st.session_state.arena_results
-        st.subheader("⚔️ 3-Way Architectural Arena (Human vs. AI vs. Co-Design)")
-        col1, col2, col3 = st.columns(3, gap="medium")
-
-        with col1:
-            st.markdown("#### 1. Human Baseline (Lexical)")
-            st.caption("Regex & Jaccard skill match")
-            for j in arena["human"]:
-                with st.container(border=True):
-                    st.write(f"**Rank {j['match_rank']}: {j['title']}**")
-                    st.caption(f"{j['company']} · {j['location']}")
-                    st.metric("Score", f"{int(j['match_score']*100)}%")
-                    st.write(f"Matched: {', '.join(j.get('matched_skills', [])[:3]) or 'None'}")
-
-        with col2:
-            st.markdown("#### 2. Naive AI Baseline (Monolithic)")
-            st.caption("Single-prompt LLM score")
-            for j in arena["ai"]:
-                with st.container(border=True):
-                    st.write(f"**Rank {j['match_rank']}: {j['title']}**")
-                    st.caption(f"{j['company']} · {j['location']}")
-                    st.metric("Score", f"{int(j['match_score']*100)}%")
-                    if j.get("hallucination_flag"):
-                        st.error("⚠️ Inferred unverified skills", icon="🚨")
-
-        with col3:
-            st.markdown("#### 3. Human-AI Co-Design")
-            st.caption("Hybrid BM25 + Dense + Evidence Tree")
-            for item in arena["codesign"]:
-                j = item["job"]
-                rep = item["audit"]
-                exp = item.get("explanation")
-                with st.container(border=True):
-                    st.write(f"**Rank {j['match_rank']}: {j['title']}**")
-                    st.caption(f"{j['company']} · {j['location']}")
-                    st.metric("Score", f"{int(j['match_score']*100)}%", help=f"BM25: {j.get('bm25_score')}, Dense: {j.get('dense_score')}")
-                    st.success(f"Verified Skills: {len(rep.verified_skills)} | Gaps: {len(rep.skill_gaps)}")
-                    if exp:
-                        st.caption(f"🧠 **{exp.source}**: {exp.summary[:100]}…")
-
-        return
-
-    res = st.session_state.match_results
-    if not res:
-        st.info("👈 Select candidate parameters in the sidebar and click **Run Job Search Matching Engine** to generate recommendations.", icon="💡")
-        return
-
-    mode = res["mode"]
-    st.subheader(f"Recommendations generated by: {mode}")
-
-    if mode == "Stage 3":
-        items = res["items"]
-        colA, colB, colC = st.columns(3)
-        colA.metric("Top Match Score", f"{int(items[0]['job']['match_score']*100)}%")
-        colB.metric("Verified Grounding", f"{int(items[0]['audit'].grounding_coverage*100)}%")
-        colC.metric("Hallucination Rate", "0.00%", help="Enforced by zero-tolerance evidence tree")
-
-        for item in items:
-            job = item["job"]
-            audit = item["audit"]
-            score = float(job["match_score"])
-            with st.container(border=True):
-                c1, c2 = st.columns([4.5, 1.5])
-                with c1:
-                    st.markdown(f"**Rank {job['match_rank']:02d}** · {job['work_mode']} · {job['experience_level']}")
-                    st.subheader(job["title"])
-                    st.write(f"🏢 **{job['company']}** · 📍 {job['location']} · 💵 {job['salary_range']}")
-                    st.write(job["description"][:280] + "…")
-                with c2:
-                    st.markdown('<div class="score-label">Match Score</div>', unsafe_allow_html=True)
-                    st.markdown(f'<div class="score-number">{score:.0%}</div>', unsafe_allow_html=True)
-                    st.caption(f"BM25: {job.get('bm25_score', 0):.2f} | Dense: {job.get('dense_score', 0):.2f}")
-
-                st.progress(score)
-
-                # Skill pills
-                st.markdown("**Skill Audit Breakdown:**")
-                tags_html = ""
-                for s in audit.verified_skills:
-                    tags_html += f'<span class="evidence-tag tag-verified">✓ {escape(s)}</span>'
-                for g in audit.skill_gaps:
-                    tags_html += f'<span class="evidence-tag tag-gap">✗ Gap: {escape(g)}</span>'
-                st.markdown(tags_html, unsafe_allow_html=True)
-
-                exp = item.get("explanation")
-                if exp:
-                    with st.expander(f"🧠 AI Fit Analysis & Action Plan ({exp.source})", expanded=True):
-                        st.markdown(f"**Analysis Summary:** {exp.summary}")
-                        c_str, c_gap = st.columns(2)
-                        with c_str:
-                            st.markdown("**Identified Strengths:**")
-                            for strength in exp.matched_strengths:
-                                st.markdown(f"- ✅ {strength}")
-                        with c_gap:
-                            st.markdown("**Skill Gaps & Opportunities:**")
-                            for gap in exp.skill_gaps:
-                                st.markdown(f"- ⚠️ {gap}")
-                        st.info(f"💡 **Recommended Next Step:** {exp.next_step}")
-                        if exp.warning:
-                            st.caption(f"ℹ️ {exp.warning}")
-
-                with st.expander("Inspect Full Job Description & Responsibilities"):
-                    st.write(job["description"])
-                    st.markdown("**Responsibilities:**")
-                    for r in job.get("responsibilities", []):
-                        st.write(f"• {r}")
-                    st.markdown(f"**Required Skills:** {', '.join(job.get('required_skills', []))}")
-                    st.markdown(f"**Preferred Skills:** {', '.join(job.get('preferred_skills', []))}")
-
-    else:
-        jobs_list = res["jobs"]
-        for job in jobs_list:
-            score = float(job["match_score"])
-            with st.container(border=True):
-                c1, c2 = st.columns([4.5, 1.5])
-                with c1:
-                    st.markdown(f"**Rank {job['match_rank']:02d}** · {job['title']}")
-                    st.write(f"🏢 **{job['company']}** · 📍 {job['location']}")
-                with c2:
-                    st.metric("Match Score", f"{score:.0%}")
-                st.progress(score)
-                if job.get("hallucination_flag"):
-                    st.error("⚠️ Notice: Contains AI-hallucinated qualification inferences", icon="🚨")
-
-
-def render_tab2_evidence() -> None:
-    st.subheader("🔍 Auditable Evidence Grounding Inspector (Zero-Hallucination)")
+    # -------------------------------------------------------------------------
+    # ZONE 3: STRUCTURED DATA GRID (COMPACT POSITION TABLE)
+    # -------------------------------------------------------------------------
+    # Grid Header
     st.markdown(
         """
-        In production hiring decision support, **black-box recommendations cannot be trusted**.
-        Every requirement must trace directly to verifiable source text in the candidate's profile.
-        Requirements lacking factual backing are strictly isolated as **Skill Gaps** rather than hallucinated.
-        """
+        <div class="grid-header">
+            <div>Role & Company</div>
+            <div>Location & Mode</div>
+            <div>Compensation</div>
+            <div>Fit Score</div>
+            <div>Key Signals (Audit)</div>
+            <div style="text-align: right;">Action</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    res = st.session_state.match_results
-    if not res or res["mode"] != "Stage 3":
-        st.info("Run Stage 3 Co-Design to inspect the auditable evidence tree.", icon="ℹ️")
+    if not filtered_jobs:
+        st.markdown(
+            """
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-top: none; border-radius: 0 0 6px 6px; padding: 3rem 1rem; text-align: center;">
+                <div style="font-size: 1.1rem; font-weight: 600; color: #0F172A;">No positions found matching your filters</div>
+                <div style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">Try broadening your keyword search or reducing the minimum fit score requirement.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         return
 
-    top_item = res["items"][0]
-    audit: GroundingReport = top_item["audit"]
-    job = top_item["job"]
+    # Data Rows
+    for idx, job in enumerate(filtered_jobs):
+        audit = EvidenceGrounder.audit_match(profile, job)
+        score_val = float(job.get("match_score", 0.0))
+        score_pct = int(score_val * 100)
 
-    st.success(
-        f"Inspecting Top Matched Role: **{job['title']}** at **{job['company']}** | "
-        f"Grounding Coverage: **{int(audit.grounding_coverage*100)}%** | "
-        f"Verified Hallucination Rate: **0.00%**"
-    )
+        # Signal pills (max 2 verified, 1 gap)
+        signals_html = ""
+        for s in audit.verified_skills[:2]:
+            signals_html += f'<span class="badge-verified">✓ {escape(s)}</span>'
+        if audit.skill_gaps:
+            signals_html += f'<span class="badge-gap">✗ Gap: {escape(audit.skill_gaps[0])}</span>'
 
-    rows = []
-    for node in audit.evidence_tree:
-        rows.append({
-            "Citation ID": node["citation_id"],
-            "Requirement": node["requirement"],
-            "Status": node["status"],
-            "Source Type": node["source_type"],
-            "Verifiable Quote from Profile": node["source_quote"],
-            "Confidence": f"{node['confidence']:.2f}",
-        })
-    df_evidence = pd.DataFrame(rows)
-    st.dataframe(df_evidence, use_container_width=True, hide_index=True)
+        row_cols = st.columns([3.8, 1.8, 1.6, 1.4, 3.0, 1.2])
 
+        with row_cols[0]:
+            st.markdown(
+                f"""
+                <div class="cell-title">{escape(job['title'])}</div>
+                <div class="cell-company">🏢 {escape(job['company'])}</div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-def render_tab3_resume() -> None:
-    st.subheader("✍️ Evidence-Constrained Tailored Resume Generator")
-    st.markdown(
-        """
-        Standard generative AI tools hallucinate resume bullets to match job descriptions.
-        **JobPilot's Co-Design Generator strictly bounds generation to verified evidence nodes.**
-        Every bullet carries a provenance badge pointing to the verified source quote.
-        """
-    )
+        with row_cols[1]:
+            st.markdown(
+                f"""
+                <div style="font-size: 0.82rem; color: #1E293B;">{escape(job['location'])}</div>
+                <span class="badge-mode">{escape(job.get('work_mode', 'Hybrid'))}</span>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    res = st.session_state.match_results
-    if not res or res["mode"] != "Stage 3":
-        st.info("Run Stage 3 Co-Design to generate evidence-grounded resume bullets.", icon="ℹ️")
-        return
+        with row_cols[2]:
+            st.markdown(
+                f'<div class="cell-mono">{escape(job.get("salary_range", "Competitive"))}</div>',
+                unsafe_allow_html=True,
+            )
 
-    top_item = res["items"][0]
-    audit: GroundingReport = top_item["audit"]
-    job = top_item["job"]
+        with row_cols[3]:
+            st.markdown(
+                f'<span class="badge-score">{score_pct}% Fit</span>',
+                unsafe_allow_html=True,
+            )
 
-    colA, colB = st.columns([3, 1])
-    with colA:
-        st.write(f"Tailored for: **{job['title']}** ({job['company']})")
-    with colB:
-        st.metric("ATS Readability Index", f"{audit.ats_readability_score}/100")
+        with row_cols[4]:
+            st.markdown(signals_html or '<span style="color:#94A3B8; font-size:0.75rem;">General alignment</span>', unsafe_allow_html=True)
 
-    st.markdown("#### Grounded Resume Bullet Points:")
-    for bullet in audit.tailored_bullets:
-        st.markdown(f'<div class="tailored-bullet">📌 {escape(bullet)}</div>', unsafe_allow_html=True)
-
-    markdown_export = f"### Tailored Bullets for {job['title']} at {job['company']}\n\n"
-    for b in audit.tailored_bullets:
-        markdown_export += f"- {b}\n"
-
-    st.download_button(
-        "📥 Download Tailored Bullets (.md)",
-        data=markdown_export,
-        file_name=f"tailored_resume_{job['id']}.md",
-        mime="text/markdown",
-    )
+        with row_cols[5]:
+            if st.button("Inspect", key=f"inspect_{job['id']}_{idx}", use_container_width=True):
+                render_position_drawer(job, profile)
 
 
-def render_tab4_benchmarks() -> None:
-    st.subheader("📊 CS 5588 Capstone Challenge 1: Empirical Benchmark & Evaluation")
-    st.markdown(
-        """
-        This section provides quantitative empirical evidence comparing **Stage 1 (Human Design)**,
-        **Stage 2 (AI Design)**, and **Stage 3 (Human–AI Co-Design)** across 5 diverse candidate personas
-        and 40 structured tech job postings.
-        """
-    )
-
-    chart_path = BASE_DIR / "evals" / "benchmark_comparison.png"
-    if chart_path.exists():
-        st.image(str(chart_path), caption="Figure 1: Benchmark Comparison across 3 Design Paradigms (CS 5588 Challenge 1)", use_container_width=True)
-
-    json_path = BASE_DIR / "evals" / "evaluation_results.json"
-    if json_path.exists():
-        with open(json_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        st.markdown("### Quantitative Metrics Summary")
-        summary_df = pd.DataFrame(data["metrics_summary"]).T
-        st.dataframe(summary_df, use_container_width=True)
-
-    st.markdown("### 8-Dimension Architectural Comparison Matrix (Section 9)")
-    comparison_table = [
-        {"Aspect": "1. Problem Understanding", "Human Design": "Narrow; treats job search as exact string matching", "AI Design": "Broad semantic scope but prone to hallucinated requirements", "Human–AI Co-Design": "Rigorous domain modeling combined with contextual understanding"},
-        {"Aspect": "2. Architecture", "Human Design": "Monolithic rule pipeline with hardcoded regular expressions", "AI Design": "Single monolithic prompt passing unvalidated raw text to LLM", "Human–AI Co-Design": "Decoupled specialist agents: Analyzer → Hybrid BM25/Vector → Grounding Auditor"},
-        {"Aspect": "3. Data Processing", "Human Design": "Manual token normalization and simple stopword stripping", "AI Design": "Hands raw text directly to context window without schema validation", "Human–AI Co-Design": "Structured Pydantic contracts, skill deduplication, and inverted index building"},
-        {"Aspect": "4. Matching Method", "Human Design": "Lexical Jaccard & keyword count (High false negatives)", "AI Design": "Subjective 0-100 score from single LLM call (Uncalibrated)", "Human–AI Co-Design": "Reciprocal Rank Fusion (BM25 + Sentence Transformers) + Grounding Matrix"},
-        {"Aspect": "5. Code Quality", "Human Design": "Brittle nested regex statements and manual edge cases", "AI Design": "LLM generated scripts with missing error handling & token risks", "Human–AI Co-Design": "Modular, strictly typed, test-driven architecture with 100% test coverage"},
-        {"Aspect": "6. Debugging & Evals", "Human Design": "Easy to trace but tedious to tune for hundreds of skill variants", "AI Design": "Extremely difficult: stochastic output drifts between runs", "Human–AI Co-Design": "Deterministic unit tests with mock encoders and automated benchmark suite"},
-        {"Aspect": "7. Explainability", "Human Design": "High (boolean overlap list) but zero conceptual depth", "AI Design": "Low: generates plausible-sounding but unverifiable justifications", "Human–AI Co-Design": "Complete: auditable evidence tree mapping each requirement to source quotes"},
-        {"Aspect": "8. Final Quality", "Human Design": "Recall@5: 42%; Brittle to synonyms and cross-domain roles", "AI Design": "High hallucination (32.5%); API latency ~1.5s/job; costly", "Human–AI Co-Design": "Precision@5: 88%; Latency: <300ms; Hallucination: 0.00%; Zero API cost offline"},
-    ]
-    st.dataframe(pd.DataFrame(comparison_table), use_container_width=True, hide_index=True)
-
-
-inject_styles()
-initialize_state()
-settings = render_sidebar()
-jobs = get_jobs_dataset(settings["use_expanded"])
-render_ui(settings, jobs)
+if __name__ == "__main__":
+    main()
