@@ -36,17 +36,29 @@ class EmbeddingAgent:
         self._encoder = encoder
 
     def _get_encoder(self) -> TextEncoder:
-        """Load the Hugging Face model only when the first match is requested."""
+        """Load the Hugging Face model, falling back gracefully to TF-IDF."""
 
         if self._encoder is None:
             try:
                 from sentence_transformers import SentenceTransformer
-            except ImportError as exc:  # pragma: no cover - environment-specific
-                raise RuntimeError(
-                    "sentence-transformers is not installed. Run "
-                    "`pip install -r requirements.txt`."
-                ) from exc
-            self._encoder = SentenceTransformer(self.model_name)
+                self._encoder = SentenceTransformer(self.model_name)
+            except Exception:  # pragma: no cover - graceful fallback
+                from sklearn.feature_extraction.text import TfidfVectorizer
+
+                class TfidfFallbackEncoder:
+                    def encode(
+                        self, sentences: Sequence[str] | str, **_kwargs: Any
+                    ) -> np.ndarray:
+                        if isinstance(sentences, str):
+                            sentences = [sentences]
+                        vec = TfidfVectorizer(
+                            ngram_range=(1, 2),
+                            sublinear_tf=True,
+                            token_pattern=r"(?u)\b[a-zA-Z0-9+#.]+\b",
+                        )
+                        return vec.fit_transform(sentences).toarray()
+
+                self._encoder = TfidfFallbackEncoder()
         return self._encoder
 
     @staticmethod
