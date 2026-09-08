@@ -77,6 +77,14 @@ def inject_enterprise_styles() -> None:
             --indigo-600: #4F46E5;
         }
 
+        /* Hide default Streamlit header bar and toolbar */
+        header[data-testid="stHeader"] {
+            display: none !important;
+        }
+        [data-testid="stToolbar"] {
+            display: none !important;
+        }
+
         .stApp {
             background-color: var(--slate-50) !important;
             color: var(--slate-900) !important;
@@ -85,7 +93,7 @@ def inject_enterprise_styles() -> None:
 
         .block-container {
             max-width: 1360px !important;
-            padding-top: 1.25rem !important;
+            padding-top: 1.75rem !important;
             padding-bottom: 3.5rem !important;
             padding-left: 2rem !important;
             padding-right: 2rem !important;
@@ -108,6 +116,7 @@ def inject_enterprise_styles() -> None:
             display: flex;
             align-items: center;
             gap: 10px;
+            height: 100%;
         }
 
         .navbar-logo {
@@ -133,27 +142,6 @@ def inject_enterprise_styles() -> None:
             padding: 3px 8px;
             border-radius: 4px;
             border: 1px solid var(--slate-200);
-        }
-
-        /* Breadcrumbs */
-        .breadcrumb-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: var(--slate-500);
-            margin-bottom: 1rem;
-        }
-        .breadcrumb-link {
-            color: var(--slate-600);
-            font-weight: 500;
-        }
-        .breadcrumb-separator {
-            color: var(--slate-400);
-        }
-        .breadcrumb-active {
-            color: var(--slate-900);
-            font-weight: 600;
         }
 
         /* Filter Control Bar */
@@ -502,31 +490,63 @@ def render_evaluation_lab_dialog(profile: UserProfile, jobs: list[dict[str, Any]
 
     with tab_arch:
         st.markdown("#### Tri-Tier System Architecture Workflow")
-        st.markdown(
+        st.html(
             """
-```mermaid
-graph TD
-    A[Candidate Profile Input] --> B[Hybrid Matcher Engine]
-    C[40 Verified Positions Corpus] --> B
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 14px;">
+                    <div style="font-weight: 600; font-size: 0.85rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: #0F172A; color: #FFFFFF; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-family: monospace;">STAGE 1</span>
+                        <b>Dual-Input Ingestion & Extraction</b>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
+                        Extracts candidate technical credentials and normalizes requirements across the 40 verified tech positions corpus.
+                    </div>
+                </div>
 
-    subgraph Dual-Stream Retrieval
-        B -->|Lexical Stream| D[BM25 Okapi Matcher]
-        B -->|Dense Stream| E[Sentence-Transformers all-MiniLM-L6-v2]
-    end
+                <div style="text-align: center; color: #94A3B8; font-size: 0.9rem; line-height: 1;">&darr;</div>
 
-    D --> F[Reciprocal Rank Fusion RRF]
-    E --> F
-    F --> G[Top-K Ranked Candidates]
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 14px;">
+                    <div style="font-weight: 600; font-size: 0.85rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: #4F46E5; color: #FFFFFF; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-family: monospace;">STAGE 2</span>
+                        <b>Dual-Stream Hybrid Retrieval & Reciprocal Rank Fusion (RRF)</b>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 4px; padding: 6px 10px;">
+                            <b style="color: #0F172A;">Lexical Stream:</b> BM25 Okapi exact keyword matching
+                        </div>
+                        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 4px; padding: 6px 10px;">
+                            <b style="color: #0F172A;">Dense Semantic:</b> Sentence-Transformers MiniLM-L6-v2 embeddings
+                        </div>
+                    </div>
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 6px;">
+                        Fused via reciprocal consensus: <code>RRF(d) = &Sigma; 1 / (60 + rank_i(d))</code> to maximize recall and precision.
+                    </div>
+                </div>
 
-    G --> H[Auditable Evidence Grounder]
-    A --> H
-    H --> I[Verified Overlaps Quote Tree]
-    H --> J[Identified Skill Gaps]
+                <div style="text-align: center; color: #94A3B8; font-size: 0.9rem; line-height: 1;">&darr;</div>
 
-    I --> K[Reasoning Agent Gemini / Groq]
-    J --> K
-    K --> L[ATS-Tailored Bullets & Pitch]
-```
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 14px;">
+                    <div style="font-weight: 600; font-size: 0.85rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: #059669; color: #FFFFFF; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-family: monospace;">STAGE 3</span>
+                        <b>Auditable Evidence Grounding (Zero-Hallucination Guarantee)</b>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
+                        Constructs verifiable citation quote trees (<code>EV-xxx-01</code>). Unsubstantiated requirements are strictly classified as Skill Gaps.
+                    </div>
+                </div>
+
+                <div style="text-align: center; color: #94A3B8; font-size: 0.9rem; line-height: 1;">&darr;</div>
+
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 10px 14px;">
+                    <div style="font-weight: 600; font-size: 0.85rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: #D97706; color: #FFFFFF; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; font-family: monospace;">STAGE 4</span>
+                        <b>Evidence-Constrained Tailoring & Pipeline Action</b>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
+                        Generates ATS-optimized resume bullets and targeted cover letters strictly grounded in proven candidate profile facts.
+                    </div>
+                </div>
+            </div>
             """
         )
 
@@ -577,40 +597,76 @@ def render_settings_dialog() -> None:
 
     with tab_prof:
         st.markdown("#### Active Candidate Credentials")
-        st.text_area("Technical Skills (comma-separated)", key="profile_skills", height=80)
+        new_skills = st.text_area("Technical Skills (comma-separated)", value=st.session_state.get("profile_skills", ""), height=80)
         c1, c2 = st.columns(2)
         with c1:
-            st.selectbox("Seniority Level", ["Student", "Junior", "Entry-level", "Mid-level", "Senior"], key="experience_level")
-            st.slider("Years of Experience", 0.0, 20.0, step=0.5, key="years_experience")
+            levels = ["Graduate Student", "Student", "Junior", "Entry-level", "Mid-level", "Senior", "Lead / Principal"]
+            curr_lvl = st.session_state.get("experience_level", "Graduate Student")
+            lvl_idx = levels.index(curr_lvl) if curr_lvl in levels else 0
+            new_level = st.selectbox("Seniority Level", levels, index=lvl_idx)
+            new_years = st.slider("Years of Experience", 0.0, 20.0, value=float(st.session_state.get("years_experience", 2.0)), step=0.5)
         with c2:
-            st.text_input("Target Job Titles", key="target_roles")
-            st.text_input("Preferred Locations", key="preferred_locations")
-        st.multiselect("Work Style Preferences", ["On-site", "Hybrid", "Remote"], key="work_preferences")
-        st.text_area("Professional Experience Summary", key="professional_summary", height=80)
+            new_roles = st.text_input("Target Job Titles", value=st.session_state.get("target_roles", ""))
+            new_locs = st.text_input("Preferred Locations", value=st.session_state.get("preferred_locations", ""))
+        all_work_modes = ["On-site", "Hybrid", "Remote"]
+        curr_prefs = [m for m in st.session_state.get("work_preferences", []) if m in all_work_modes]
+        new_prefs = st.multiselect("Work Style Preferences", all_work_modes, default=curr_prefs)
+        new_summary = st.text_area("Professional Experience Summary", value=st.session_state.get("professional_summary", ""), height=80)
 
     with tab_api:
         st.markdown("#### AI Reasoning Provider")
-        st.selectbox("LLM Provider Service", ["gemini", "groq", "offline"], key="llm_provider", format_func=lambda x: "Google Gemini (Official · Free Quota)" if x == "gemini" else ("Groq (Llama-3.3)" if x == "groq" else "Local Offline ($0 / No Key)"))
-        if st.session_state.llm_provider == "gemini":
-            st.text_input("Gemini API Key", key="gemini_key", type="password", help="Get free key from https://aistudio.google.com/apikey")
-            st.selectbox("Gemini Model", ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest"], key="llm_model")
+        providers = ["gemini", "groq", "offline"]
+        curr_prov = st.session_state.get("llm_provider", "gemini")
+        p_idx = providers.index(curr_prov) if curr_prov in providers else 0
+        new_prov = st.selectbox(
+            "LLM Provider Service",
+            providers,
+            index=p_idx,
+            format_func=lambda x: "Google Gemini (Official · Free Quota)" if x == "gemini" else ("Groq (Llama-3.3)" if x == "groq" else "Local Offline ($0 / No Key)")
+        )
+        new_gem_key = st.session_state.get("gemini_key", "")
+        new_groq_key = st.session_state.get("groq_key", "")
+        curr_model = st.session_state.get("llm_model", "gemini-2.5-flash")
+
+        if new_prov == "gemini":
+            new_gem_key = st.text_input("Gemini API Key", value=new_gem_key, type="password", help="Get free key from https://aistudio.google.com/apikey")
+            gem_models = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]
+            m_idx = gem_models.index(curr_model) if curr_model in gem_models else 0
+            new_model = st.selectbox("Gemini Model", gem_models, index=m_idx)
             st.caption("✨ Powered by Google Gemini API (15 RPM / 1M TPM free tier)")
-        elif st.session_state.llm_provider == "groq":
-            st.text_input("Groq API Key", key="groq_key", type="password")
-            st.text_input("Groq Model", key="llm_model", value="llama-3.3-70b-versatile")
+        elif new_prov == "groq":
+            new_groq_key = st.text_input("Groq API Key", value=new_groq_key, type="password")
+            new_model = st.text_input("Groq Model", value=curr_model if "llama" in curr_model else "llama-3.3-70b-versatile")
         else:
+            new_model = "local-deterministic"
             st.caption("🔒 Operating 100% offline with local deterministic evidence rules.")
 
-    if st.button("Apply and Reload Search", type="primary", use_container_width=True):
-        st.rerun()
+    c_act1, c_act2 = st.columns([6, 6])
+    with c_act1:
+        if st.button("Apply and Reload Search", type="primary", use_container_width=True):
+            st.session_state.profile_skills = new_skills
+            st.session_state.experience_level = new_level
+            st.session_state.years_experience = float(new_years)
+            st.session_state.target_roles = new_roles
+            st.session_state.preferred_locations = new_locs
+            st.session_state.work_preferences = new_prefs
+            st.session_state.professional_summary = new_summary
+            st.session_state.llm_provider = new_prov
+            st.session_state.gemini_key = new_gem_key
+            st.session_state.groq_key = new_groq_key
+            st.session_state.llm_model = new_model
+            st.rerun()
+    with c_act2:
+        if st.button("Cancel", type="secondary", use_container_width=True):
+            st.rerun()
 
 
 # =============================================================================
 # VIEW A: POSITION DETAIL DEEP DIVE (WITH EXPLICIT BACK BUTTON)
 # =============================================================================
-def render_position_detail_view(job_id: str, profile: UserProfile, jobs: list[dict[str, Any]]) -> None:
+def render_position_detail_view(job_id: str, profile: UserProfile, ranked_jobs: list[dict[str, Any]]) -> None:
     """Full-page deep dive with prominent back button, auditable evidence tree, and ATS tailor."""
-    target_job = next((j for j in jobs if j.get("id") == job_id), None)
+    target_job = next((j for j in ranked_jobs if j.get("id") == job_id), None)
     if not target_job:
         st.error(f"Position ID '{job_id}' not found in active repository.", icon="⚠️")
         st.button("← Back to Positions", on_click=navigate_to_list, type="primary")
@@ -627,12 +683,12 @@ def render_position_detail_view(job_id: str, profile: UserProfile, jobs: list[di
     with c_bread:
         st.markdown(
             f"""
-            <div class="breadcrumb-container">
-                <span class="breadcrumb-link">Positions</span>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-link">{escape(target_job['company'])}</span>
-                <span class="breadcrumb-separator">/</span>
-                <span class="breadcrumb-active">{escape(target_job['title'])}</span>
+            <div style="display: flex; align-items: center; min-height: 38px; font-size: 0.88rem; color: #475569; padding-left: 6px;">
+                <span style="color: #64748B;">Positions</span>
+                <span style="margin: 0 8px; color: #94A3B8;">/</span>
+                <span style="color: #475569; font-weight: 500;">{escape(target_job['company'])}</span>
+                <span style="margin: 0 8px; color: #94A3B8;">/</span>
+                <span style="color: #0F172A; font-weight: 600;">{escape(target_job['title'])}</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -642,7 +698,7 @@ def render_position_detail_view(job_id: str, profile: UserProfile, jobs: list[di
     st.markdown(
         f"""
         <div class="detail-card">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #0F172A; line-line: 1.2;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #0F172A; line-height: 1.2;">
                 {escape(target_job['title'])}
             </div>
             <div style="font-size: 0.95rem; color: #475569; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
@@ -727,7 +783,7 @@ def render_position_detail_view(job_id: str, profile: UserProfile, jobs: list[di
                                     <span class="badge-verified">✓ {escape(node['requirement'])}</span>
                                     <span class="citation-id">{node['citation_id']}</span>
                                 </div>
-                                <div class="evidence-quote">"{escape(node['source_quote'])}"</div>
+                                <div class="evidence-quote">{escape(node['source_quote'])}</div>
                             </div>
                             """,
                             unsafe_allow_html=True,
@@ -779,7 +835,7 @@ def render_position_detail_view(job_id: str, profile: UserProfile, jobs: list[di
 # =============================================================================
 # VIEW B: STRUCTURED POSITION DIRECTORY (LIST VIEW)
 # =============================================================================
-def render_position_list_view(profile: UserProfile, jobs: list[dict[str, Any]]) -> None:
+def render_position_list_view(profile: UserProfile, ranked_jobs: list[dict[str, Any]], all_jobs: list[dict[str, Any]]) -> None:
     """Render the master list view with instant filter bar and 6-column data grid."""
     # -------------------------------------------------------------------------
     # ZONE 1: TOP NAVIGATION BAR
@@ -824,13 +880,7 @@ def render_position_list_view(profile: UserProfile, jobs: list[dict[str, Any]]) 
 
         with c_lab:
             if st.button("🧪 Model Lab", use_container_width=True, help="Inspect benchmark comparison and 3-way arena"):
-                render_evaluation_lab_dialog(profile, jobs)
-
-    # -------------------------------------------------------------------------
-    # RUN HYBRID RANKING (INSTANT / CACHED)
-    # -------------------------------------------------------------------------
-    matcher = get_cached_hybrid_matcher()
-    ranked_jobs = matcher.rank_jobs(profile, jobs)
+                render_evaluation_lab_dialog(profile, all_jobs)
 
     # -------------------------------------------------------------------------
     # ZONE 2: LIVE HORIZONTAL FILTER BAR (PATTERN B)
@@ -864,16 +914,19 @@ def render_position_list_view(profile: UserProfile, jobs: list[dict[str, Any]]) 
                 "Min Fit Score",
                 min_value=0,
                 max_value=90,
-                value=st.session_state.filter_min_score,
                 step=5,
                 key="filter_min_score",
-                format="%d%%",
+                format="≥ %d%%",
                 label_visibility="collapsed",
+                help="Filter positions by minimum match fit score",
             )
         with f5:
-            if st.button("Reset", use_container_width=True, help="Reset all filters"):
-                reset_filters()
-                st.rerun()
+            st.button(
+                "Reset",
+                on_click=reset_filters,
+                use_container_width=True,
+                help="Reset all filters to default",
+            )
 
     # Apply In-Memory Reactive Filtering
     kw = st.session_state.filter_keyword.strip().lower()
@@ -903,11 +956,12 @@ def render_position_list_view(profile: UserProfile, jobs: list[dict[str, Any]]) 
 
     # Results Counter & Summary Strip
     target_roles_display = ", ".join(profile.target_roles) if profile.target_roles else "General Tech"
+    pos_word = "position" if len(filtered_jobs) == 1 else "positions"
     st.markdown(
         f"""
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; padding: 0 4px;">
             <div style="font-size: 0.82rem; color: #475569; font-weight: 500;">
-                Showing <b>{len(filtered_jobs)}</b> verified positions for <b>{escape(target_roles_display)}</b>
+                Showing <b>{len(filtered_jobs)}</b> verified {pos_word} for <b>{escape(target_roles_display)}</b>
             </div>
             <div style="font-size: 0.75rem; color: #64748B;">
                 Ranked by Hybrid RRF (BM25 Lexical + Dense Semantic MiniLM)
@@ -1033,11 +1087,15 @@ def main():
         st.error(f"Profile Configuration Error: {exc}", icon="⚠️")
         return
 
+    # Rank Jobs with Hybrid Co-Design Engine
+    matcher = get_cached_hybrid_matcher()
+    ranked_jobs = matcher.rank_jobs(profile, jobs)
+
     # Master-Detail Router (Pattern A)
     if st.session_state.nav_view == "detail" and st.session_state.selected_job_id:
-        render_position_detail_view(st.session_state.selected_job_id, profile, jobs)
+        render_position_detail_view(st.session_state.selected_job_id, profile, ranked_jobs)
     else:
-        render_position_list_view(profile, jobs)
+        render_position_list_view(profile, ranked_jobs, jobs)
 
 
 if __name__ == "__main__":
