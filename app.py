@@ -868,11 +868,12 @@ def main():
         filtered_jobs.sort(key=lambda j: j.get("match_score", 0.0), reverse=True)
 
     # Results Counter & Summary Strip
+    target_roles_display = ", ".join(profile.target_roles) if profile.target_roles else "General Tech"
     st.markdown(
         f"""
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; padding: 0 4px;">
             <div style="font-size: 0.82rem; color: #475569; font-weight: 500;">
-                Showing <b>{len(filtered_jobs)}</b> verified positions for <b>{escape(profile.target_roles or 'General Tech')}</b>
+                Showing <b>{len(filtered_jobs)}</b> verified positions for <b>{escape(target_roles_display)}</b>
             </div>
             <div style="font-size: 0.75rem; color: #64748B;">
                 Ranked by Hybrid RRF (BM25 Lexical + Dense Semantic MiniLM)
