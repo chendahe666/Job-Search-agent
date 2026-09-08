@@ -24,9 +24,18 @@ class JobRepository:
         "location",
     }
 
-    def __init__(self, data_path: str | Path | None = None) -> None:
-        default_path = Path(__file__).with_name("jobs.json")
-        self.data_path = Path(data_path) if data_path else default_path
+    def __init__(
+        self,
+        data_path: str | Path | None = None,
+        *,
+        use_expanded: bool = False,
+    ) -> None:
+        if data_path:
+            self.data_path = Path(data_path)
+        elif use_expanded:
+            self.data_path = Path(__file__).with_name("expanded_jobs.json")
+        else:
+            self.data_path = Path(__file__).with_name("jobs.json")
 
     def load_jobs(self) -> list[dict[str, Any]]:
         """Return validated postings while preserving the JSON display order.
