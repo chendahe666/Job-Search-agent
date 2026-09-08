@@ -393,7 +393,7 @@ def render_sidebar() -> dict[str, Any]:
         )
         gemini_key = ""
         groq_key = ""
-        llm_model = "gemini-1.5-flash"
+        llm_model = "gemini-3.6-flash"
         if "Gemini" in llm_provider:
             gemini_key = st.text_input(
                 "Gemini API Key",
@@ -401,7 +401,7 @@ def render_sidebar() -> dict[str, Any]:
                 type="password",
                 help="Get your free key at https://aistudio.google.com/apikey",
             )
-            llm_model = st.selectbox("Gemini Model", ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"], index=0)
+            llm_model = st.selectbox("Gemini Model", ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-pro"], index=0)
             st.caption("✨ Powered by Google Gemini API (15 RPM / 1M TPM free tier)")
         elif "Groq" in llm_provider:
             groq_key = st.text_input(

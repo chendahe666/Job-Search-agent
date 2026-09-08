@@ -19,9 +19,16 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 import re
 import time
 from typing import Any, Sequence
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+except ImportError:
+    pass
 
 from .profile_analyzer import UserProfile
 
@@ -29,7 +36,7 @@ from .profile_analyzer import UserProfile
 class AIMatcher:
     """Monolithic single-prompt AI matching agent reflecting Stage 2 AI design."""
 
-    DEFAULT_GEMINI_MODEL = "gemini-1.5-flash"
+    DEFAULT_GEMINI_MODEL = "gemini-3.6-flash"
     DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
 
     PROMPT_TEMPLATE = (

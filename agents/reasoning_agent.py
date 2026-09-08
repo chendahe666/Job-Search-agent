@@ -11,8 +11,15 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import json
 import os
+from pathlib import Path
 import re
 from typing import Any
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+except ImportError:
+    pass
 
 from .profile_analyzer import UserProfile
 
@@ -36,7 +43,7 @@ class FitExplanation:
 class ReasoningAgent:
     """Generate evidence-grounded fit reasoning with Gemini, Groq, or local rules."""
 
-    DEFAULT_GEMINI_MODEL = "gemini-1.5-flash"
+    DEFAULT_GEMINI_MODEL = "gemini-3.6-flash"
     DEFAULT_GROQ_MODEL = "llama-3.3-70b-versatile"
 
     SYSTEM_PROMPT = (
