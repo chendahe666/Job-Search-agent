@@ -443,7 +443,7 @@ def initialize_session_state() -> None:
 @st.cache_resource(show_spinner=False)
 def get_cached_job_corpus() -> list[dict[str, Any]]:
     """Load the canonical 40 verified tech positions repository."""
-    return JobRepository.load_expanded_jobs()
+    return JobRepository(use_expanded=True).load_jobs()
 
 
 @st.cache_resource(show_spinner=False)
@@ -535,9 +535,9 @@ graph TD
         st.caption("Execute all three ranking paradigms simultaneously on the active profile.")
 
         col_human, col_ai, col_co = st.columns(3)
-        human_ranked = HumanMatcher().match(profile, jobs)[:3]
-        ai_ranked = AIMatcher().match(profile, jobs)[:3]
-        co_ranked = get_cached_hybrid_matcher().rank_positions(profile, jobs)[:3]
+        human_ranked = HumanMatcher().rank_jobs(profile, jobs)[:3]
+        ai_ranked = AIMatcher().rank_jobs(profile, jobs)[:3]
+        co_ranked = get_cached_hybrid_matcher().rank_jobs(profile, jobs)[:3]
 
         with col_human:
             st.markdown("**1. Human Baseline (Lexical)**")
@@ -642,7 +642,7 @@ def render_position_detail_view(job_id: str, profile: UserProfile, jobs: list[di
     st.markdown(
         f"""
         <div class="detail-card">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #0F172A; line-height: 1.2;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #0F172A; line-line: 1.2;">
                 {escape(target_job['title'])}
             </div>
             <div style="font-size: 0.95rem; color: #475569; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
@@ -830,7 +830,7 @@ def render_position_list_view(profile: UserProfile, jobs: list[dict[str, Any]]) 
     # RUN HYBRID RANKING (INSTANT / CACHED)
     # -------------------------------------------------------------------------
     matcher = get_cached_hybrid_matcher()
-    ranked_jobs = matcher.rank_positions(profile, jobs)
+    ranked_jobs = matcher.rank_jobs(profile, jobs)
 
     # -------------------------------------------------------------------------
     # ZONE 2: LIVE HORIZONTAL FILTER BAR (PATTERN B)
@@ -1021,7 +1021,6 @@ def main():
     # Parse Active Profile
     try:
         profile = ProfileAnalyzer().analyze(
-            raw_text=st.session_state.professional_summary,
             skills=st.session_state.profile_skills,
             experience_level=st.session_state.experience_level,
             years_experience=st.session_state.years_experience,
