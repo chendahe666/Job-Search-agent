@@ -12,3 +12,6 @@ venv/
 
 # Sentence Transformers / Hugging Face model cache (keep it outside Git)
 .cache/
+
+# Private local resume, job, and application records
+local_data/

@@ -1,159 +1,139 @@
-# RoleSignal & JobPilot
+# RoleSignal · Personal Resume Workspace
 
-> **CS 5588 Data Science Capstone — Challenge 1**  
-> *Human, AI, and Human–AI Co-Design of an Evidence-Grounded Job Search Application*
+CS 5588 capstone: a Python / Streamlit job-search application with specialist
+agents and explicit human review. The current interface is resume-first and
+supports Chinese / English UI switching for users exploring US software, AI/ML,
+and data roles. The language selector changes interface labels, not resume text.
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/unit_tests-11%20passing-brightgreen.svg)]()
-[![Hallucination Rate](https://img.shields.io/badge/hallucination_rate-0.00%25-success.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-informational.svg)]()
+## Start locally
 
-RoleSignal turns a candidate's skills, experience, and career context into an explainable, auditable shortlist of technology roles. Unlike generic 'auto-apply bots' that spray unvetted applications and hallucinate qualifications, RoleSignal enforces **verifiable decision support with a 0.00% hallucination guarantee**. Every matched claim maps to an immutable source citation in the candidate's master profile, with unsupported requirements strictly isolated as *Skill Gaps*.
+Use Python 3.11+ and a virtual environment:
 
----
-
-## What the System Demonstrates
-
-- **Three-Stage Design Evolution**: Demonstrates the progression from brittle heuristics (**Stage 1 Human Design**) and ungrounded generative hallucinations (**Stage 2 AI Design**) to high-precision hybrid retrieval (**Stage 3 Human–AI Co-Design**).
-- **Two-Stage Funnel Architecture**: Inverted BM25 lexical recall + dense vector embeddings (`sentence-transformers/all-MiniLM-L6-v2`) blended via Reciprocal Rank Fusion (RRF), achieving **< 250ms end-to-end query latency** and zero API cost.
-- **Bi-Directional Evidence Grounding Tree**: Inspectable provenance mapping every job requirement to verbatim quotes from the candidate profile with unique citation tags (e.g., `EV-northsta-01`).
-- **Evidence-Constrained Resume Tailoring**: Generates ATS-optimized bullet points strictly bounded by verified evidence nodes.
-- **Self-Contained 5-Page PDF Report**: Fully reproducible academic report matching all 11 required sections of CS 5588 Challenge 1.
-
----
-
-## Architecture Overview
-
-```mermaid
-flowchart TD
-    subgraph S1["Stage 1: Human Baseline (Lexical)"]
-        H_In["Candidate Skills"] --> H_Regex["Regex / Jaccard Set Intersection"]
-        H_Regex --> H_Out["Brittle Matches (Recall@5: 42%)"]
-    end
-
-    subgraph S2["Stage 2: AI Baseline (Monolithic LLM)"]
-        AI_In["Raw Profile + Job JSON"] --> AI_Prompt["Single Prompt LLM"]
-        AI_Prompt --> AI_Out["Subjective Score + 32.5% Hallucinations\n(Latency: ~1.5s/job)"]
-    end
-
-    subgraph S3["Stage 3: Human–AI Co-Design (Production Funnel)"]
-        CD_Prof["Structured Profile"] --> CD_Pre["Pydantic Validator"]
-        CD_JDs["Expanded Tech Corpus (40 Roles)"] --> CD_Idx["BM25 Index + Dense Vector Space"]
-        CD_Pre & CD_Idx --> CD_Funnel["Two-Stage Funnel\n(BM25 + Sentence Transformers RRF)"]
-        CD_Funnel --> CD_Top["Top-K Candidate Roles"]
-        CD_Top & CD_Prof --> CD_Auditor["Evidence Grounding Auditor\n(Verbatim Citation Tree)"]
-        CD_Auditor --> CD_Result["0.00% Hallucination Shortlist\n+ Verified Skill Badges + Tailored Bullets"]
-    end
+```powershell
+py -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python -m streamlit run app.py --server.address=127.0.0.1
 ```
 
----
+Open the local URL printed in the terminal (normally http://localhost:8501).
+No API key is needed to begin. Keep the server bound to localhost: this is a
+single-user tool, not an authenticated multi-user service.
 
-## Repository Structure
+## Everyday workflow
+
+1. **Paste your experience.** An existing resume or a few project notes are
+   enough. Only the experience field is required; skills and other details are
+   optional. Empty inputs show actionable errors without trapping the user.
+2. **Choose one direction.** Software Engineer, AI/ML Engineer, or Data Scientist.
+   This labels the version and guides optional AI edits; it does not magically
+   rewrite a resume or invent experience.
+3. **Edit and save.** Original text is preserved as the initial draft. Save new
+   versions, compare source-linked AI suggestions, and download plain-text copies.
+   Loading an older version first backs up the current nonempty draft.
+4. **Add a real job.** Paste its title and JD, optionally its company, source URL,
+   and explicit skill requirements. URL entry stores a link; it does not scrape.
+   Repeated links/JDs are deduplicated without overwriting an existing snapshot.
+5. **Track the application.** Save progress, next steps, a follow-up date, and
+   the exact resume version used. Nothing is submitted automatically.
+
+Navigation preserves experience/editor drafts within the browser session.
+Explicitly save before closing the browser. Saved material and versions survive
+server restarts. Settings exports all stored business records as JSON.
+
+## Optional AI editing
+
+Open **Settings / 设置**, select Gemini or Groq, and enter an
+API key plus a model ID supported by that provider. Keys remain in session
+memory and are not written to the database. This UI does not silently use keys
+from `.env`; provider modules retain environment configuration for direct use.
+
+The user must consent before sending the current complete draft and associated
+JD to the selected provider. Remove unnecessary personal information first.
+Suggestions show the exact original excerpt and proposed replacement. Internal
+prompts, raw provider errors, and raw response metadata are not displayed.
+Recognizable instruction echoes and newly introduced numerical claims are
+rejected before rendering; this is defense in depth, not a secrecy guarantee.
+The user selects which edits to apply, then separately saves a new version.
+Failures preserve the original and allow manual editing. Live API calls are not
+part of the automated test suite.
+
+## Architecture and matching methods
 
 ```text
-Job-Search-agent/
-├── app.py                         # Streamlit multi-tab decision support dashboard
-├── agents/
-│   ├── __init__.py                # Exported agent modules
-│   ├── human_matcher.py           # Stage 1: Lexical Jaccard & regex baseline
-│   ├── ai_matcher.py              # Stage 2: Monolithic prompt LLM baseline
-│   ├── hybrid_matcher.py          # Stage 3: Two-stage BM25 + dense embedding funnel
-│   ├── evidence_grounder.py       # Stage 3: Evidence provenance tree & anti-hallucination engine
-│   ├── profile_analyzer.py        # Deterministic profile schema normalizer
-│   ├── embedding_agent.py         # Hugging Face Sentence Transformers specialist
-│   └── reasoning_agent.py         # Optional Groq LLM reasoning + local fallback
-├── data/
-│   ├── jobs.json                  # Baseline 10 mock tech postings
-│   ├── expanded_jobs.json         # Expanded 40 structured tech postings across 6 domains
-│   ├── generate_expanded_jobs.py  # Data generation script
-│   └── retriever.py               # Data layer boundary with schema validation
-├── evals/
-│   ├── run_evaluations.py         # 5-persona comparative benchmark harness
-│   ├── evaluation_results.json    # Serialized empirical benchmark metrics
-│   └── benchmark_comparison.png   # Publication-quality benchmark chart
-├── report/
-│   ├── generate_challenge1_report.py  # 5-page self-contained PDF compiler
-│   ├── generate_visual_assets.py      # Matplotlib figures generator
-│   ├── figures/                       # High-resolution architectural and UI figures
-│   └── CS5588_Challenge1_Report_Chen.pdf # Final compiled deliverable
-├── tests/
-│   └── test_agents.py             # 11 offline unit tests with injected doubles
-├── requirements.txt
-└── README.md
+app.py                    Streamlit entry point, no eager model load
+ui/workspace.py           Guided workflow and explicit approval controls
+services/workspace.py     Local SQLite records and immutable resume snapshots
+agents/
+  profile_analyzer.py     Deterministic normalization of structured profile input
+  embedding_agent.py      Sentence Transformers + cosine similarity
+  hybrid_matcher.py       Weighted dense and lexical ranking
+  resume_agent.py         Optional source-linked LLM editing proposals
+  evidence_grounder.py    Conservative explicit skill-declaration reporting
+  reasoning_agent.py      Provider adapters and fit-explanation API
+  human_matcher.py        Legacy rule-based experiment baseline
+  ai_matcher.py           Legacy monolithic AI / simulation baseline
+data/                     Original 10 and expanded 40 fictional tech postings
+tests/                    Offline unit and Streamlit interaction tests
+local_data/               Private local database; excluded from Git
+evals/, report/           Historical course experiment artifacts
 ```
 
----
+These are specialist responsibilities, not autonomous agents with permission to
+submit applications. Deterministic storage and validation enforce workflow
+boundaries; language models propose text but cannot directly save a final resume.
 
-## Empirical Benchmark Results (CS 5588 Challenge 1)
+Job ranking runs **only when requested**, across the whole selected corpus.
+MiniLM embeddings are compared using cosine similarity, with a 60% dense / 40%
+lexical weighted score (BM25 when available, token overlap otherwise). RRF is
+retained as a diagnostic field, not the final ranking criterion. The UI only
+loads an already-cached embedding model; it never downloads model weights on
+startup. If unavailable, it displays that TF-IDF replaced semantic embeddings.
+To intentionally provision the model ahead of time:
 
-Evaluated across 5 standardized candidate personas (Junior ML, Senior Backend, Frontend/UI, Cloud/DevOps, Application Security) searching 40 diverse technology postings:
-
-| Metric | Stage 1: Human Design | Stage 2: AI Design | Stage 3: Human–AI Co-Design |
-| :--- | :--- | :--- | :--- |
-| **Top-5 Precision** | 88.0% (Exact roles only) | 68.0% (Semantic drift) | **80.0%** (Optimal domain recall) |
-| **Hallucination Rate** | 0.00% (No generation) | 32.50% (Fabricated skills) | **0.00% (Audited Grounding Tree)** |
-| **Query Latency (End-to-End)** | 2.06 ms (Instant regex) | 1,450 ms (Slow LLM API) | **249.7 ms (12x faster than AI)** |
-| **Token Cost per 100 Queries** | $0.00 | $4.80 | **$0.00 (Local offline indexing)** |
-| **Explainability / Provenance** | 100% (Exact token list) | 12.0% (Subjective blurbs) | **100.0% (Verbatim profile citations)** |
-
----
-
-## Quickstart & Local Reproduction
-
-### 1. Clone and Install Dependencies
-
-```bash
-git clone https://github.com/chendahe666/Job-Search-agent.git
-cd Job-Search-agent
-pip install -r requirements.txt
+```powershell
+.venv\Scripts\python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 ```
 
-### 2. Run the Offline Unit Test Suite
+Matching and search are distinct: keyword search always covers all selected
+postings, not a hidden top-five shortlist. Fictional jobs are an opt-in demo and
+cannot enter the real application tracker. Scores indicate text alignment, not
+hiring probability, skill verification, or eligibility.
 
-The test suite runs in under 2 seconds and does not require internet access or GPU:
+## Honesty and privacy boundaries
 
-```bash
-python -m unittest discover -s tests -v
+- A skill mention is not proof of proficiency. Free-text negations are not
+  converted into verified skills. Missing evidence means “needs confirmation.”
+- No claim of zero hallucinations or measured ATS performance is made. Legacy
+  `hallucination_rate` and `ats_readability_score` now return `None` (unknown).
+- Source-linked edits still require human fact checking. An LLM can introduce
+  unsupported wording even when it cites a genuine source excerpt.
+- Application/visa/authorization answers are not inferred or submitted.
+- `local_data/workspace.db` contains unencrypted personal data. Protect the
+  computer and any backups. The app has no account isolation or public hosting
+  security. `ROLESIGNAL_DB` can select a separate local database for testing.
+- Previous `evals/` and `report/` outputs contain illustrative/simulated metrics
+  and outdated UI descriptions. They are retained as historical artifacts, NOT
+  validated results for this revision. Re-evaluation is needed before academic
+  reporting; do not reuse the old zero-hallucination claims.
+
+## Tests
+
+```powershell
+.venv\Scripts\python -m unittest discover -s tests -v
 ```
 
-### 3. Run Comparative Benchmarks
+Tests use isolated databases, fake provider responses and injected embeddings.
+Coverage includes bilingual switching, wizard validation/navigation, draft preservation, job-to-resume
+navigation, tracking, immutable saves, duplicate imports, complete-corpus search,
+negated skills, and safe application of selected exact-source edits.
 
-Executes evaluation across all 5 candidate personas and regenerates empirical charts:
+## Current scope
 
-```bash
-python evals/run_evaluations.py
-```
+Available: paste-based material entry, editable drafts, role-specific version
+labels, opt-in AI edits, TXT/JSON downloads, real-JD storage, local ranking,
+and durable manual tracking.
 
-### 4. Launch the Interactive Streamlit Dashboard
-
-```bash
-streamlit run app.py
-```
-
-Visit `http://localhost:8501` to test:
-- **Tab 1: 3-Way Arena**: Compare Stage 1, Stage 2, and Stage 3 side-by-side.
-- **Tab 2: Evidence Grounding Tree**: Inspect exact source citations mapping requirements to candidate experience.
-- **Tab 3: Evidence-Constrained Resume Tailor**: Preview tailored bullet points with `[Src: ...]` provenance tags.
-- **Tab 4: Benchmark Dashboard**: View empirical metrics and comparison matrix.
-
-### 5. Compile the 5-Page Capstone PDF Report
-
-```bash
-python report/generate_challenge1_report.py
-```
-
-Produces `report/CS5588_Challenge1_Report_Chen.pdf` formatted strictly according to the CS 5588 Capstone rubric.
-
----
-
-## Future Roadmap: Autonomous JobPilot Agent
-
-- **Phase 2 — Multi-Board Data Ingestion (JobSpy)**: Integrate lightweight concurrent API scrapers for LinkedIn, Indeed, Glassdoor, and ZipRecruiter without headless browser overhead.
-- **Phase 3 — Browser-Use & Web MCP Form Auto-Fill**: Implement a Chrome Model Context Protocol (MCP) agent navigating the **Accessibility Tree (ARIA)** to safely pre-fill application forms with human-in-the-loop one-click confirmation.
-- **Phase 4 — Career Graph Knowledge Modeling**: Graph-based skills ontologies predicting career trajectory and upskilling pathways.
-
----
-
-## License
-
-MIT License. Designed for CS 5588 Data Science Capstone, Fall 2026.
+Not yet implemented: PDF/Word parsing or formatted export, structured project
+interviews, automatic job feeds, authorization/sponsorship screening, browser
+autofill, email integration, background reminders, or automatic application
+submission. A saved follow-up date is a record, not a scheduled notification.

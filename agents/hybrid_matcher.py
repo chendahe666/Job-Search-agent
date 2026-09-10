@@ -134,7 +134,7 @@ class HybridMatcher:
             enriched["dense_score"] = round(float(dense_s), 4)
             enriched["bm25_score"] = round(float(bm25_s), 4)
             enriched["rrf_score"] = round(float(rrf_score), 6)
-            enriched["method"] = "Stage 3 Co-Design (Hybrid BM25 + Dense RRF)"
+            enriched["method"] = "Weighted hybrid (60% dense + 40% lexical); RRF diagnostic only"
             hybrid_jobs.append(enriched)
 
         # Sort descending by hybrid combined score
