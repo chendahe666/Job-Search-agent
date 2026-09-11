@@ -1,139 +1,189 @@
-# RoleSignal · Personal Resume Workspace
+# 🧭 JobPilot
 
-CS 5588 capstone: a Python / Streamlit job-search application with specialist
-agents and explicit human review. The current interface is resume-first and
-supports Chinese / English UI switching for users exploring US software, AI/ML,
-and data roles. The language selector changes interface labels, not resume text.
+**An evidence-grounded, self-correcting job-matching agent.**
+JobPilot searches the live web for real, currently open US job postings, verifies every lead against the employer's
+own ATS page, filters out hard conflicts, matches each requirement to verbatim evidence pulled from your resume
+(RAG), scores what's left, and re-plans its own search when the results are weak.
 
-## Start locally
+中文界面默认开启，可随时切换 English / Bilingual UI (中文 / English), toggle anytime.
 
-Use Python 3.11+ and a virtual environment:
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](#requirements)
+[![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B)](#requirements)
+[![Tests: unittest](https://img.shields.io/badge/tests-unittest-informational)](#testing)
+[![License: unspecified](https://img.shields.io/badge/license-unspecified-lightgrey)](#license)
 
-```powershell
-py -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python -m streamlit run app.py --server.address=127.0.0.1
+---
+
+## Table of contents
+
+- [Why JobPilot](#why-jobpilot)
+- [How it works](#how-it-works)
+- [Hard rules vs. soft signals](#hard-rules-vs-soft-signals)
+- [Anti-hallucination guarantees](#anti-hallucination-guarantees)
+- [Requirements](#requirements)
+- [Getting started](#getting-started)
+- [Using the app](#using-the-app)
+- [Project layout](#project-layout)
+- [Testing](#testing)
+- [Cost & limits](#cost--limits)
+- [Migrating from the legacy RoleSignal (v1) code](#migrating-from-the-legacy-rolesignal-v1-code)
+- [Known issues](#known-issues)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Why JobPilot
+
+Most "job matching" tools either hallucinate requirements or trust job boards blindly. JobPilot is built around a
+single rule: **every claim it makes must be traceable to a quote from the original source.** A posting is only
+scored once it has been verified live against the employer's own ATS; a "match" is only shown once the matching
+requirement has been located verbatim in your resume.
+
+## How it works
+
+```mermaid
+flowchart LR
+  R[READ<br/>resume → evidence chunks<br/>BM25 + vector index] --> P[PLAN<br/>search tasks]
+  P --> S[SEARCH<br/>Gemini + Google Search<br/>ATS-site queries]
+  S --> W[WORK<br/>Greenhouse / Lever / Ashby / Workday API<br/>JSON-LD · HTML · URL context]
+  W --> V[VERIFY<br/>live? closed? title & company match?]
+  V --> E[EVALUATE<br/>hard filters with quotes →<br/>RAG evidence → weighted score → tiers]
+  E --> C{REFLECT<br/>critic}
+  C -- weak results --> P
+  C -- target / budget / saturated --> O[REPORT<br/>A/B/C shortlist · evidence · issues · suggestions]
 ```
 
-Open the local URL printed in the terminal (normally http://localhost:8501).
-No API key is needed to begin. Keep the server bound to localhost: this is a
-single-user tool, not an authenticated multi-user service.
+The agent loop (`jobpilot/agent/orchestrator.py`) repeats **SEARCH → WORK → VERIFY → EVALUATE → REFLECT** until it
+either hits your target count/budget or the critic decides the search space is saturated, then produces a final
+report with a tiered shortlist, evidence matrix, and open issues.
 
-## Everyday workflow
+## Hard rules vs. soft signals
 
-1. **Paste your experience.** An existing resume or a few project notes are
-   enough. Only the experience field is required; skills and other details are
-   optional. Empty inputs show actionable errors without trapping the user.
-2. **Choose one direction.** Software Engineer, AI/ML Engineer, or Data Scientist.
-   This labels the version and guides optional AI edits; it does not magically
-   rewrite a resume or invent experience.
-3. **Edit and save.** Original text is preserved as the initial draft. Save new
-   versions, compare source-linked AI suggestions, and download plain-text copies.
-   Loading an older version first backs up the current nonempty draft.
-4. **Add a real job.** Paste its title and JD, optionally its company, source URL,
-   and explicit skill requirements. URL entry stores a link; it does not scrape.
-   Repeated links/JDs are deduplicated without overwriting an existing snapshot.
-5. **Track the application.** Save progress, next steps, a follow-up date, and
-   the exact resume version used. Nothing is submitted automatically.
+| Hard gates (exclude, with quoted evidence) | Soft score dimensions (0–100, weighted) |
+|---|---|
+| Posting dead / closed / link mismatch | Skills: per-requirement resume evidence (required 1.0, preferred 0.35) |
+| Explicit *no sponsorship* / *citizens only* / *clearance* (if you need sponsorship) | Experience & level fit |
+| Work mode not selected, location outside your cities (metro-aware), remote but not US | Role alignment (title overlap + embeddings) |
+| Seniority ≥ 2 levels away · years required > yours + tolerance | Location / work-mode preference order |
+| Employment type · posted before your window · company / title blocklists | Compensation vs. floor · sponsorship likelihood (posting + employer H-1B history) |
+| Salary below floor *(off by default)* | Dream company / industry · freshness · your 👍/👎 history |
 
-Navigation preserves experience/editor drafts within the browser session.
-Explicitly save before closing the browser. Saved material and versions survive
-server restarts. Settings exports all stored business records as JSON.
+Unknown facts never cause a rejection — they become warnings and neutral scores. Every hard rule can be switched to
+a soft signal from the Setup page. The critic only changes **search strategy** (ATS sites, title synonyms, metro
+cities, skill focus, sponsorship-friendly queries, recency) — it never relaxes your constraints, and instead
+suggests changes to you in the final report.
 
-## Optional AI editing
+## Anti-hallucination guarantees
 
-Open **Settings / 设置**, select Gemini or Groq, and enter an
-API key plus a model ID supported by that provider. Keys remain in session
-memory and are not written to the database. This UI does not silently use keys
-from `.env`; provider modules retain environment configuration for direct use.
+These are structural checks in the pipeline, not prompt-level promises:
 
-The user must consent before sending the current complete draft and associated
-JD to the selected provider. Remove unnecessary personal information first.
-Suggestions show the exact original excerpt and proposed replacement. Internal
-prompts, raw provider errors, and raw response metadata are not displayed.
-Recognizable instruction echoes and newly introduced numerical claims are
-rejected before rendering; this is defense in depth, not a secrecy guarantee.
-The user selects which edits to apply, then separately saves a new version.
-Failures preserve the original and allow manual editing. Live API calls are not
-part of the automated test suite.
+- Search leads are untrusted until **VERIFY** confirms them (public ATS API / HTTP status / closed-posting markers /
+  title & company consistency).
+- LLM-extracted requirements and sponsorship quotes must appear verbatim in the posting text; resume evidence quotes
+  must appear verbatim in the cited chunk — otherwise they're discarded and marked `unverified`, never scored.
+- Resume parsing drops any bullet that isn't verbatim in the source document; AI-tailored application bullets are
+  checked for numbers/skills that aren't present in the cited evidence before they're shown to you.
+- Aggregators (LinkedIn, Indeed, …) are never scraped directly; they're read only via Gemini URL context and capped
+  below tier A.
 
-## Architecture and matching methods
+## Requirements
+
+- Python 3.10+ (tested on 3.11, also runs on 3.14)
+- A [Gemini API key](https://aistudio.google.com/apikey) — **optional**, the app runs fully in demo mode without one
+
+## Getting started
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env            # add GEMINI_API_KEY (optional — demo mode works without it)
+streamlit run app.py
+```
+
+`.env` variables (see [`.env.example`](.env.example)):
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `GEMINI_API_KEY` | Enables live search/matching; leave blank for demo mode | — |
+| `GEMINI_MODEL` | Generation model (Settings → "Test connection" lists what your key can use) | `gemini-3.8-flash` |
+| `GEMINI_EMBED_MODEL` | Embedding model for RAG (falls back to local hashing vectors if unavailable) | `gemini-embedding-001` |
+
+Sanity-check your API key end-to-end before a full run:
+
+```bash
+python scripts/smoke_gemini.py "Machine Learning Engineer" "Austin, TX"
+```
+
+## Using the app
+
+1. **设置档案 / Setup** — upload or paste your resume, review the parsed profile, then fill in targets, hard
+   constraints and priorities.
+2. **运行 Agent / Run** — the agent runs on a background thread; watch every stage live and stop it at any time.
+3. **匹配结果 / Matches** — tiered cards (A apply now · B tailor · C stretch · excluded with reasons), an evidence
+   matrix, a verification log, a fact-checked application kit, and 👍/👎 feedback.
+4. **投递看板 / Pipeline** and **运行报告 / Reports** — track applications and export a run as Markdown/CSV.
+
+## Project layout
 
 ```text
-app.py                    Streamlit entry point, no eager model load
-ui/workspace.py           Guided workflow and explicit approval controls
-services/workspace.py     Local SQLite records and immutable resume snapshots
-agents/
-  profile_analyzer.py     Deterministic normalization of structured profile input
-  embedding_agent.py      Sentence Transformers + cosine similarity
-  hybrid_matcher.py       Weighted dense and lexical ranking
-  resume_agent.py         Optional source-linked LLM editing proposals
-  evidence_grounder.py    Conservative explicit skill-declaration reporting
-  reasoning_agent.py      Provider adapters and fit-explanation API
-  human_matcher.py        Legacy rule-based experiment baseline
-  ai_matcher.py           Legacy monolithic AI / simulation baseline
-data/                     Original 10 and expanded 40 fictional tech postings
-tests/                    Offline unit and Streamlit interaction tests
-local_data/               Private local database; excluded from Git
-evals/, report/           Historical course experiment artifacts
+app.py                      Streamlit entry point (top navigation, language toggle)
+ui/                          views (profile wizard, run, matches, pipeline, reports, settings), i18n, components, runner
+jobpilot/
+  schemas.py                Pydantic domain models (profile, preferences, posting, evidence, run report)
+  taxonomy.py                dropdown data, skill synonyms, metros, sponsorship & closed-posting patterns
+  llm/gemini.py              REST client: google_search + url_context tools, JSON schema, retries, usage metering
+  llm/prompts.py             prompts + LLM DTOs
+  ingest/resume_parser.py    PDF/DOCX/TXT → profile (LLM with verbatim checks, or offline)
+  rag/                       chunker, BM25, embeddings (Gemini + local fallback), hybrid RRF retriever
+  search/                    planner, Gemini grounded searcher, ATS adapters, fetcher
+  extract/                   heuristics + WORK-stage builder (ATS/JSON-LD/HTML/URL context, LLM refinement)
+  verify/verifier.py         liveness & consistency checks
+  evaluate/                  hard filters, RAG evidence matcher, scoring & tiers
+  agent/                     orchestrator loop, critic, employer sponsorship intel
+  report/                    Markdown/CSV export, fact-checked tailoring
+  storage/db.py               SQLite (`.jobpilot/jobpilot.db`)
+tests/                        unit + end-to-end pipeline tests (simulated Gemini/HTTP) + Streamlit AppTest UI tests
+scripts/                      smoke_gemini.py, cleanup_legacy.py
 ```
 
-These are specialist responsibilities, not autonomous agents with permission to
-submit applications. Deterministic storage and validation enforce workflow
-boundaries; language models propose text but cannot directly save a final resume.
+## Testing
 
-Job ranking runs **only when requested**, across the whole selected corpus.
-MiniLM embeddings are compared using cosine similarity, with a 60% dense / 40%
-lexical weighted score (BM25 when available, token overlap otherwise). RRF is
-retained as a diagnostic field, not the final ranking criterion. The UI only
-loads an already-cached embedding model; it never downloads model weights on
-startup. If unavailable, it displays that TF-IDF replaced semantic embeddings.
-To intentionally provision the model ahead of time:
-
-```powershell
-.venv\Scripts\python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+```bash
+python -m unittest discover -s tests -t .
 ```
 
-Matching and search are distinct: keyword search always covers all selected
-postings, not a hidden top-five shortlist. Fictional jobs are an opt-in demo and
-cannot enter the real application tracker. Scores indicate text alignment, not
-hiring probability, skill verification, or eligibility.
+The suite covers the agent pipeline end-to-end against simulated Gemini/HTTP responses (`tests/fakes.py`), the core
+`jobpilot` modules, and the Streamlit UI via `streamlit.testing.v1.AppTest`. See [Known issues](#known-issues) for
+current failures.
 
-## Honesty and privacy boundaries
+## Cost & limits
 
-- A skill mention is not proof of proficiency. Free-text negations are not
-  converted into verified skills. Missing evidence means “needs confirmation.”
-- No claim of zero hallucinations or measured ATS performance is made. Legacy
-  `hallucination_rate` and `ats_readability_score` now return `None` (unknown).
-- Source-linked edits still require human fact checking. An LLM can introduce
-  unsupported wording even when it cites a genuine source excerpt.
-- Application/visa/authorization answers are not inferred or submitted.
-- `local_data/workspace.db` contains unencrypted personal data. Protect the
-  computer and any backups. The app has no account isolation or public hosting
-  security. `ROLESIGNAL_DB` can select a separate local database for testing.
-- Previous `evals/` and `report/` outputs contain illustrative/simulated metrics
-  and outdated UI descriptions. They are retained as historical artifacts, NOT
-  validated results for this revision. Re-evaluation is needed before academic
-  reporting; do not reuse the old zero-hallucination claims.
+Gemini 3 models bill Google Search grounding **per executed search query** (with a monthly free allowance); the Run
+page shows a pre-run cost estimate and live usage, and you can set a requests-per-minute cap for the free tier. LLM
+job-description extraction is only spent on postings that already passed the cheap deterministic filters. See the
+[official Gemini pricing page](https://ai.google.dev/pricing) for current numbers.
 
-## Tests
+## Migrating from the legacy RoleSignal (v1) code
 
-```powershell
-.venv\Scripts\python -m unittest discover -s tests -v
+This repository previously hosted a CS5588 Stage 1/2/3 comparison project (`agents/`, `data/`, `evals/`, `report/`).
+That code is retired in favor of the `jobpilot/` architecture above but still ships in this tree for reference.
+Remove it once you no longer need it:
+
+```bash
+python scripts/cleanup_legacy.py --yes     # dry run without --yes
+# or: git rm -r agents data evals report tests/test_agents.py
 ```
 
-Tests use isolated databases, fake provider responses and injected embeddings.
-Coverage includes bilingual switching, wizard validation/navigation, draft preservation, job-to-resume
-navigation, tracking, immutable saves, duplicate imports, complete-corpus search,
-negated skills, and safe application of selected exact-source edits.
+## Known issues
 
-## Current scope
+- `tests/test_ui.py::test_1_wizard_to_demo_run_to_matches` currently fails (`KeyError` on an uninitialized
+  `st.session_state` widget key) when run via `streamlit.testing.v1.AppTest` on Streamlit ≥ 1.60 — all other 37
+  tests pass. Tracked as a follow-up; contributions welcome.
 
-Available: paste-based material entry, editable drafts, role-specific version
-labels, opt-in AI edits, TXT/JSON downloads, real-JD storage, local ranking,
-and durable manual tracking.
+## Contributing
 
-Not yet implemented: PDF/Word parsing or formatted export, structured project
-interviews, automatic job feeds, authorization/sponsorship screening, browser
-autofill, email integration, background reminders, or automatic application
-submission. A saved follow-up date is a record, not a scheduled notification.
+Issues and pull requests are welcome. Please run the test suite (see [Testing](#testing)) before submitting, and
+keep new hard-coded facts (skills, metros, ATS patterns) in `jobpilot/taxonomy.py` rather than scattered across
+modules.
+
+## License
+
+No license file is currently included in this repository — all rights reserved by default until one is added. If
