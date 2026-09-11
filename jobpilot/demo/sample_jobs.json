@@ -1,0 +1,402 @@
+[
+ {
+  "id": "northstar-ml-001",
+  "title": "Machine Learning Engineer",
+  "company": "Northstar Health AI",
+  "location": "Chicago, IL",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 0,
+  "description": "Build and operate machine-learning services that help hospital care teams identify patients who may benefit from earlier clinical intervention. You will partner with data scientists and platform engineers to turn validated models into monitored, auditable production APIs. This role works with sensitive health data and values reproducibility, careful model evaluation, and clear documentation over experimentation for its own sake.\n\nResponsibilities:\n• Productionize PyTorch and scikit-learn models behind reliable Python APIs\n• Create model monitoring for drift, calibration, latency, and data-quality signals\n• Collaborate with clinical stakeholders to document assumptions and failure modes\n• Improve containerized training and deployment workflows on AWS\n\nRequirements:\n• Experience with Python\n• Experience with PyTorch\n• Experience with SQL\n• Experience with AWS\n• Experience with Docker\n• Experience with MLOps\n• 2+ years of professional experience\n\nNice to have:\n• FastAPI\n• MLflow\n• Healthcare data\n• Kubernetes\n\nCompensation: $118,000–$148,000 per year"
+ },
+ {
+  "id": "loopline-fe-002",
+  "title": "Frontend Product Engineer",
+  "company": "Loopline Collaboration",
+  "location": "Remote — United States",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 3,
+  "description": "Own polished user-facing workflows for a collaborative planning product used by distributed teams. The product includes data-dense timelines, real-time presence, and accessible keyboard interactions. Engineers work directly with design and customer research, ship in small increments, and are expected to contribute to frontend architecture as well as product decisions.\n\nResponsibilities:\n• Develop responsive product experiences with React, TypeScript, and Next.js\n• Translate design-system patterns into accessible, reusable components\n• Write unit and browser-level tests for critical planning workflows\n• Use product analytics and customer feedback to refine shipped features\n\nRequirements:\n• Experience with React\n• Experience with TypeScript\n• Experience with Next.js\n• Experience with CSS\n• Experience with Testing\n• Experience with Accessibility\n• 2+ years of professional experience\n\nNice to have:\n• Playwright\n• Design systems\n• WebSockets\n• Product analytics\n\nCompensation: $110,000–$142,000 per year"
+ },
+ {
+  "id": "greengrid-ds-003",
+  "title": "Data Scientist, Energy Analytics",
+  "company": "GreenGrid Systems",
+  "location": "Austin, TX",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 6,
+  "description": "Develop forecasting and decision-support models for commercial energy customers managing solar generation, storage, and time-of-use pricing. The team combines telemetry, weather, and billing data to recommend operational changes with measurable cost and emissions outcomes. Success requires both statistical rigor and the ability to explain results to non-technical partners.\n\nResponsibilities:\n• Build and evaluate time-series forecasts and causal impact analyses\n• Create reproducible data preparation and model-evaluation pipelines\n• Design decision-ready Tableau dashboards for operations teams\n• Present model limitations and business recommendations to customers\n\nRequirements:\n• Experience with Python\n• Experience with SQL\n• Experience with scikit-learn\n• Experience with Statistics\n• Experience with Time series\n• Experience with Tableau\n• 2+ years of professional experience\n\nNice to have:\n• Causal inference\n• Energy markets\n• dbt\n• Airflow\n\nCompensation: $112,000–$145,000 per year"
+ },
+ {
+  "id": "finwave-be-004",
+  "title": "Backend Systems Engineer",
+  "company": "FinWave Clearing",
+  "location": "New York, NY",
+  "work_mode": "On-site",
+  "employment_type": "Full-time",
+  "posted_days_ago": 9,
+  "description": "Scale mission-critical transaction reconciliation pipelines handling millions of high-throughput ledger entries daily. We value determinism, transaction isolation, strict schema contracts, and observable telemetry across high-availability microservices.\n\nResponsibilities:\n• Architect high-throughput settlement services in Go and Java\n• Design idempotent event-driven pipelines using Apache Kafka and PostgreSQL\n• Mitigate latency regressions and audit memory bottlenecks under peak traffic\n• Participate in on-call rotation and lead root-cause postmortems\n\nRequirements:\n• Experience with Go\n• Experience with PostgreSQL\n• Experience with Kafka\n• Experience with Distributed Systems\n• Experience with Docker\n• Experience with Linux\n• 5+ years of professional software experience\n\nNice to have:\n• Java\n• gRPC\n• Kubernetes\n• FinTech\n\nCompensation: $145,000–$185,000 per year\n\nWe are unable to sponsor or take over sponsorship of an employment visa at this time."
+ },
+ {
+  "id": "skyward-platform-005",
+  "title": "Cloud Platform & DevOps Engineer",
+  "company": "Skyward Cloud Solutions",
+  "location": "Seattle, WA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 12,
+  "description": "Provide a reliable, self-service Kubernetes infrastructure platform for 50+ backend microservice teams. Eliminate deployment friction while maintaining zero-trust cloud security and SOC2 compliance standards.\n\nResponsibilities:\n• Maintain multi-region AWS and GCP Kubernetes clusters via Terraform and GitOps\n• Construct automated CI/CD deployment pipelines using GitHub Actions and ArgoCD\n• Implement end-to-end observability using Prometheus, Grafana, and OpenTelemetry\n• Automate resource governance and cost optimization across cloud fleets\n\nRequirements:\n• Experience with Kubernetes\n• Experience with Terraform\n• Experience with AWS\n• Experience with CI/CD\n• Experience with Docker\n• Experience with Python\n• 2+ years of professional experience\n\nNice to have:\n• ArgoCD\n• Prometheus\n• GCP\n• Go\n\nCompensation: $125,000–$155,000 per year"
+ },
+ {
+  "id": "nexus-nlp-006",
+  "title": "NLP / LLM Research Engineer",
+  "company": "Nexus Cognition",
+  "location": "San Francisco, CA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 15,
+  "description": "Design retrieval-augmented generation (RAG) pipelines, model fine-tuning architectures, and evaluation guardrails for enterprise customer knowledge search engines.\n\nResponsibilities:\n• Implement production RAG workflows using vector databases, LangChain, and dense embeddings\n• Conduct parameter-efficient fine-tuning (LoRA, QLoRA) on open-source foundation models\n• Establish automated hallucination detection, guardrail scoring, and benchmark evals\n• Optimize inference serving latency with vLLM and TensorRT-LLM\n\nRequirements:\n• Experience with Python\n• Experience with PyTorch\n• Experience with Transformers\n• Experience with NLP\n• Experience with Vector Databases\n• Experience with LLM\n• 5+ years of professional software experience\n\nNice to have:\n• LangChain\n• vLLM\n• RAG\n• FAISS\n\nCompensation: $160,000–$210,000 per year"
+ },
+ {
+  "id": "sentinel-sec-007",
+  "title": "Application Security Engineer",
+  "company": "Sentinel Defense Labs",
+  "location": "Washington, DC",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 18,
+  "description": "Protect customer-facing cloud APIs, web applications, and internal CI/CD pipelines from injection vulnerabilities, authentication bypasses, and supply-chain exploits.\n\nResponsibilities:\n• Perform vulnerability assessments, penetration testing, and code security audits\n• Integrate SAST, DAST, and secret scanning into GitHub Actions pipelines\n• Partner with software engineers to remediate OWASP Top 10 vulnerabilities\n• Author security architecture standards and incident response playbooks\n\nRequirements:\n• Experience with Python\n• Experience with Application Security\n• Experience with Penetration Testing\n• Experience with OWASP\n• Experience with Linux\n• Experience with CI/CD\n• 2+ years of professional experience\n\nNice to have:\n• Burp Suite\n• OAuth2\n• Cryptography\n• AWS Security\n\nCompensation: $120,000–$150,000 per year"
+ },
+ {
+  "id": "flowdata-de-008",
+  "title": "Data Platform Engineer",
+  "company": "FlowData Infrastructure",
+  "location": "Boston, MA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 21,
+  "description": "Design reliable lakehouse pipelines moving billions of clickstream events and transactional records into warehouse analytics stores with sub-minute SLAs.\n\nResponsibilities:\n• Build robust batch and streaming ELT pipelines using Apache Spark and Apache Kafka\n• Manage data models and transformations in Snowflake and BigQuery using dbt\n• Implement automated data quality checks, anomaly detection, and schema migration tests\n• Collaborate with BI analysts to deliver clean, documented semantic schemas\n\nRequirements:\n• Experience with Python\n• Experience with SQL\n• Experience with Apache Spark\n• Experience with dbt\n• Experience with Snowflake\n• Experience with Data Warehousing\n• 2+ years of professional experience\n\nNice to have:\n• Kafka\n• Airflow\n• BigQuery\n• Iceberg\n\nCompensation: $115,000–$148,000 per year\n\nVisa sponsorship is available for this position."
+ },
+ {
+  "id": "omniview-fullstack-009",
+  "title": "Full-Stack Web Engineer",
+  "company": "OmniView Analytics",
+  "location": "Denver, CO",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 24,
+  "description": "Develop full-lifecycle web features across an interactive SaaS analytics suite, connecting intuitive React/TypeScript interfaces to performant FastAPI and PostgreSQL backends.\n\nResponsibilities:\n• Deliver end-to-end features spanning React/Tailwind frontends and Python APIs\n• Design relational schemas, SQL indexes, and RESTful endpoints for analytical queries\n• Write comprehensive automated unit, integration, and E2E Cypress tests\n• Monitor application health, error tracking with Sentry, and user engagement metrics\n\nRequirements:\n• Experience with React\n• Experience with TypeScript\n• Experience with Python\n• Experience with FastAPI\n• Experience with PostgreSQL\n• Experience with REST API\n• 2+ years of professional experience\n\nNice to have:\n• Tailwind CSS\n• Docker\n• Cypress\n• Redis\n\nCompensation: $110,000–$140,000 per year"
+ },
+ {
+  "id": "apex-ai-cv-010",
+  "title": "Computer Vision & Edge ML Engineer",
+  "company": "Apex Autonomous Mobility",
+  "location": "San Jose, CA",
+  "work_mode": "On-site",
+  "employment_type": "Full-time",
+  "posted_days_ago": 27,
+  "description": "Develop and optimize real-time computer vision models (object detection, depth estimation) deployed directly to embedded robotic edge devices.\n\nResponsibilities:\n• Train and quantize PyTorch deep learning vision models for edge runtimes (ONNX, TensorRT)\n• Build automated data labeling, augmentation, and synthetic generation pipelines\n• Benchmark and minimize frame latency and power consumption on Jetson platforms\n• Interface with hardware teams to validate camera sensor calibration and driver integrity\n\nRequirements:\n• Experience with Python\n• Experience with C++\n• Experience with PyTorch\n• Experience with Computer Vision\n• Experience with OpenCV\n• Experience with Deep Learning\n• 5+ years of professional software experience\n\nNice to have:\n• TensorRT\n• ONNX\n• Embedded Systems\n• CUDA\n\nCompensation: $155,000–$195,000 per year"
+ },
+ {
+  "id": "quantedge-ml-011",
+  "title": "Quantitative ML Researcher",
+  "company": "QuantEdge Capital",
+  "location": "New York, NY",
+  "work_mode": "On-site",
+  "employment_type": "Full-time",
+  "posted_days_ago": 30,
+  "description": "Apply machine learning and statistical signal processing to tick-level financial market data to discover predictive alpha signals and execute algorithmic trading strategies.\n\nResponsibilities:\n• Develop gradient-boosted and recurrent neural networks for time-series alpha generation\n• Backtest trading hypotheses with realistic transaction costs, slippage, and market impact\n• Construct clean data pipelines for petabyte-scale historical order book logs\n• Collaborate with traders to deploy low-latency inference models\n\nRequirements:\n• Experience with Python\n• Experience with C++\n• Experience with scikit-learn\n• Experience with Statistics\n• Experience with Time series\n• Experience with SQL\n• 2+ years of professional experience\n\nNice to have:\n• NumPy\n• Pandas\n• Quantitative Finance\n• KDB+/Q\n\nCompensation: $150,000–$220,000 per year"
+ },
+ {
+  "id": "biotrack-bioinfo-012",
+  "title": "Computational Biology & Genomics Scientist",
+  "company": "BioTrack Therapeutics",
+  "location": "Cambridge, MA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 33,
+  "description": "Analyze single-cell RNA sequencing and clinical trial genomics data to identify biomarkers for targeted oncology therapeutics.\n\nResponsibilities:\n• Process high-throughput sequencing datasets using Nextflow and Python pipelines\n• Apply clustering, differential expression, and pathway enrichment algorithms\n• Maintain reproducible scientific computing notebooks and statistical reports\n• Integrate public clinical databases (TCGA, ClinVar, Ensembl) with internal assays\n\nRequirements:\n• Experience with Python\n• Experience with R\n• Experience with Statistics\n• Experience with Genomics\n• Experience with Nextflow\n• Experience with Bioinformatics\n• 2+ years of professional experience\n\nNice to have:\n• Single-cell RNA\n• Bioconductor\n• Docker\n• Machine Learning\n\nCompensation: $125,000–$160,000 per year\n\nMust be a U.S. citizen due to government contract requirements."
+ },
+ {
+  "id": "hypercloud-sre-013",
+  "title": "Site Reliability Engineer (SRE)",
+  "company": "HyperCloud Systems",
+  "location": "Dallas, TX",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 1,
+  "description": "Ensure the 99.99% availability, resilience, and operational scalability of global multi-tenant microservices through automation and chaos engineering.\n\nResponsibilities:\n• Define and monitor Service Level Objectives (SLOs), Error Budgets, and Alerting policies\n• Automate incident mitigation scripts and self-healing cloud routines using Python and Go\n• Execute chaos engineering experiments to discover distributed failure modes\n• Optimize Kubernetes autoscaling, egress traffic, and multi-region failover\n\nRequirements:\n• Experience with Kubernetes\n• Experience with Linux\n• Experience with Go\n• Experience with Python\n• Experience with Prometheus\n• Experience with Terraform\n• 5+ years of professional software experience\n\nNice to have:\n• Chaos Mesh\n• Datadog\n• Istio\n• Cloud Networking\n\nCompensation: $135,000–$175,000 per year"
+ },
+ {
+  "id": "retailiq-ds-014",
+  "title": "E-Commerce Data Scientist, Personalization",
+  "company": "RetailIQ Marketplace",
+  "location": "Seattle, WA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 4,
+  "description": "Help design and evaluate recommendation algorithms and two-sided ranking mechanisms for millions of active online shopping consumers.\n\nResponsibilities:\n• Analyze large customer clickstream logs using SQL and PySpark\n• Implement collaborative filtering and two-tower vector retrieval models\n• Design and analyze rigorous online A/B hypothesis tests with power calculations\n• Synthesize feature importance findings into product strategy recommendations\n\nRequirements:\n• Experience with Python\n• Experience with SQL\n• Experience with scikit-learn\n• Experience with A/B Testing\n• Experience with Statistics\n• Experience with Pandas\n\nNice to have:\n• Spark\n• Recommendation Systems\n• PyTorch\n• GCP\n\nCompensation: $95,000–$125,000 per year"
+ },
+ {
+  "id": "streambyte-infra-015",
+  "title": "Distributed Streaming Infrastructure Engineer",
+  "company": "StreamByte Networks",
+  "location": "San Francisco, CA",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 7,
+  "description": "Architect and maintain ultra-reliable, petabyte-scale stream processing backbones built on Apache Kafka, Apache Flink, and Rust.\n\nResponsibilities:\n• Design low-latency stateful stream processing engines handling 5M+ events/sec\n• Manage distributed Kafka clusters with strict zero data loss guarantees\n• Profile network socket I/O, JVM GC pauses, and Linux kernel TCP buffers\n• Develop declarative client SDKs and schema validation registries\n\nRequirements:\n• Experience with Go\n• Experience with Kafka\n• Experience with Distributed Systems\n• Experience with Linux\n• Experience with Docker\n• Experience with Java\n• 5+ years of professional software experience\n\nNice to have:\n• Rust\n• Flink\n• Netty\n• OpenTelemetry\n\nCompensation: $160,000–$205,000 per year"
+ },
+ {
+  "id": "vitalhealth-ds-016",
+  "title": "Healthcare Clinical Data Scientist",
+  "company": "VitalHealth Informatics",
+  "location": "Nashville, TN",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 10,
+  "description": "Mine electronic health record (EHR) longitudinal data to forecast hospital readmission risk and identify adverse drug interactions.\n\nResponsibilities:\n• Query and harmonize messy HL7/FHIR and OMOP common data model schemas with SQL\n• Train interpretable risk prediction models (logistic regression, survival analysis, XGBoost)\n• Collaborate with medical researchers to validate epidemiological study designs\n• Ensure compliance with HIPAA patient privacy de-identification protocols\n\nRequirements:\n• Experience with Python\n• Experience with SQL\n• Experience with scikit-learn\n• Experience with Healthcare data\n• Experience with Statistics\n• Experience with Pandas\n• 2+ years of professional experience\n\nNice to have:\n• FHIR\n• Survival Analysis\n• XGBoost\n• R\n\nCompensation: $115,000–$145,000 per year\n\nThis role requires an active Secret security clearance."
+ },
+ {
+  "id": "cloudshield-sec-017",
+  "title": "Cloud Security & Compliance Engineer",
+  "company": "CloudShield Networks",
+  "location": "Atlanta, GA",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 13,
+  "description": "Enforce automated security baselines, identity governance (IAM), and continuous compliance monitoring across multi-tenant AWS and Azure environments.\n\nResponsibilities:\n• Author Infrastructure-as-Code security policies using OPA Rego and Terraform\n• Configure AWS Security Hub, GuardDuty, and CloudTrail automated remediation\n• Manage enterprise identity lifecycle, SAML/SSO, and least-privilege RBAC roles\n• Lead SOC2 and ISO27001 evidence collection and technical audit defense\n\nRequirements:\n• Experience with AWS\n• Experience with Terraform\n• Experience with Cloud Security\n• Experience with Python\n• Experience with CI/CD\n• Experience with Linux\n• 2+ years of professional experience\n\nNice to have:\n• OPA Rego\n• IAM\n• Azure\n• SOC2\n\nCompensation: $125,000–$155,000 per year"
+ },
+ {
+  "id": "paypulse-be-018",
+  "title": "Payment API Backend Engineer",
+  "company": "PayPulse Systems",
+  "location": "Chicago, IL",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 16,
+  "description": "Build resilient REST APIs and webhook ingestion engines powering seamless merchant checkout experiences and ledger synchronizations.\n\nResponsibilities:\n• Write clean, well-tested Python/FastAPI and PostgreSQL microservices\n• Integrate external banking and card processor settlement protocols\n• Maintain asynchronous background task queues using Redis and Celery\n• Author detailed OpenAPI/Swagger documentation and client quickstart guides\n\nRequirements:\n• Experience with Python\n• Experience with FastAPI\n• Experience with SQL\n• Experience with PostgreSQL\n• Experience with REST API\n• Experience with Git\n\nNice to have:\n• Docker\n• Redis\n• Celery\n• Stripe API\n\nCompensation: $90,000–$120,000 per year"
+ },
+ {
+  "id": "visioncraft-fe-019",
+  "title": "Senior Frontend Architecture Engineer",
+  "company": "VisionCraft Creative Suite",
+  "location": "San Francisco, CA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 19,
+  "description": "Drive the architecture of a high-performance in-browser canvas design tool handling complex vector graphics, WebGL rendering, and multi-user collaboration.\n\nResponsibilities:\n• Architect modular React and TypeScript applications with strict state isolation\n• Optimize 60fps canvas render loops using WebGL and WebAssembly\n• Establish automated frontend performance benchmarks (LCP, INP, memory profiling)\n• Mentor engineering team on modern component patterns and accessibility standards\n\nRequirements:\n• Experience with React\n• Experience with TypeScript\n• Experience with JavaScript\n• Experience with CSS\n• Experience with Testing\n• Experience with Performance\n• 5+ years of professional software experience\n\nNice to have:\n• WebGL\n• WebAssembly\n• Zustand\n• Canvas API\n\nCompensation: $150,000–$190,000 per year"
+ },
+ {
+  "id": "cyberguard-soc-020",
+  "title": "Incident Response & Detection Engineer",
+  "company": "CyberGuard SOC",
+  "location": "Reston, VA",
+  "work_mode": "On-site",
+  "employment_type": "Full-time",
+  "posted_days_ago": 22,
+  "description": "Analyze network telemetry, endpoint alerts, and SIEM logs to investigate suspicious adversary intrusion attempts and automate response playbooks.\n\nResponsibilities:\n• Investigate endpoint detection and response (EDR) alerts across enterprise hosts\n• Write detection engineering rules (Sigma, YARA, Splunk SPL) for emerging threats\n• Automate forensic triage workflows using Python and SOAR orchestration\n• Participate in live incident response and conduct adversary postmortems\n\nRequirements:\n• Experience with Python\n• Experience with Linux\n• Experience with SIEM\n• Experience with Incident Response\n• Experience with Network Security\n• Experience with Cybersecurity\n• 2+ years of professional experience\n\nNice to have:\n• Splunk\n• EDR\n• YARA\n• Threat Hunting\n\nCompensation: $115,000–$145,000 per year\n\nH-1B sponsorship is available for qualified candidates."
+ },
+ {
+  "id": "neuroverse-ai-021",
+  "title": "Generative AI Solutions Engineer",
+  "company": "NeuroVerse AI",
+  "location": "New York, NY",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 25,
+  "description": "Partner with enterprise customers to design, prototype, and ship custom LLM agent workflows, semantic search indexes, and autonomous conversational assistants.\n\nResponsibilities:\n• Build multimodal agent workflows using LangChain, LlamaIndex, and function calling\n• Tune vector similarity search indexes and hybrid reranking mechanisms\n• Evaluate model output accuracy, prompt injections, and grounded attribution\n• Deploy secure containerized AI microservices on Google Cloud Platform (GCP)\n\nRequirements:\n• Experience with Python\n• Experience with NLP\n• Experience with LLM\n• Experience with Vector Databases\n• Experience with Docker\n• Experience with GCP\n• 2+ years of professional experience\n\nNice to have:\n• LangChain\n• LlamaIndex\n• FastAPI\n• Prompt Engineering\n\nCompensation: $130,000–$165,000 per year"
+ },
+ {
+  "id": "datalake-eng-022",
+  "title": "Big Data & Spark Pipeline Engineer",
+  "company": "DataLake Dynamics",
+  "location": "Minneapolis, MN",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 28,
+  "description": "Scale enterprise big data architectures processing multi-terabyte analytical workloads across distributed Apache Spark and Apache Iceberg storage layers.\n\nResponsibilities:\n• Tune complex PySpark and Scala jobs to eliminate shuffle skew and memory OOMs\n• Migrate legacy Hive tables to modern open table formats (Apache Iceberg, Delta Lake)\n• Automate DAG orchestration schedules with Apache Airflow and dbt\n• Implement metadata governance, data lineage, and column-level encryption\n\nRequirements:\n• Experience with Python\n• Experience with Apache Spark\n• Experience with SQL\n• Experience with Airflow\n• Experience with Data Warehousing\n• Experience with AWS\n• 5+ years of professional software experience\n\nNice to have:\n• Scala\n• Iceberg\n• dbt\n• Delta Lake\n\nCompensation: $140,000–$175,000 per year"
+ },
+ {
+  "id": "cloudbridge-devops-023",
+  "title": "DevOps Automation Specialist",
+  "company": "CloudBridge Systems",
+  "location": "Austin, TX",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 31,
+  "description": "Modernize team deployment infrastructure, automate testing pipelines, and accelerate feature shipping velocity for an agile SaaS team.\n\nResponsibilities:\n• Maintain GitHub Actions and GitLab CI/CD pipelines with caching and parallel stages\n• Manage container images with Dockerfile multi-stage builds and vulnerability audits\n• Write modular Terraform configurations for AWS RDS, S3, and ECS services\n• Monitor server health with CloudWatch and draft on-call operational runbooks\n\nRequirements:\n• Experience with Linux\n• Experience with Docker\n• Experience with AWS\n• Experience with CI/CD\n• Experience with Git\n• Experience with Python\n\nNice to have:\n• Terraform\n• Bash\n• GitHub Actions\n• Kubernetes\n\nCompensation: $85,000–$115,000 per year"
+ },
+ {
+  "id": "deepvision-robotics-024",
+  "title": "Robotics Perception & SLAM Engineer",
+  "company": "DeepVision Robotics",
+  "location": "Pittsburgh, PA",
+  "work_mode": "On-site",
+  "employment_type": "Full-time",
+  "posted_days_ago": 34,
+  "description": "Build real-time 3D perception, point-cloud segmentation, and visual-inertial odometry algorithms for autonomous warehouse logistics robots.\n\nResponsibilities:\n• Implement Visual SLAM and LiDAR odometry algorithms running on ROS2 in C++\n• Develop deep learning models for dynamic obstacle detection and track prediction\n• Optimize point cloud processing using PCL and GPU acceleration\n• Validate vehicle navigation safety in both simulated Gazebo and physical environments\n\nRequirements:\n• Experience with C++\n• Experience with Python\n• Experience with Computer Vision\n• Experience with ROS2\n• Experience with Linux\n• Experience with Deep Learning\n• 5+ years of professional software experience\n\nNice to have:\n• SLAM\n• LiDAR\n• PyTorch\n• CUDA\n\nCompensation: $150,000–$190,000 per year\n\nCandidates must be authorized to work in the United States without the need for current or future visa sponsorship."
+ },
+ {
+  "id": "marketpulse-analytics-025",
+  "title": "Business Intelligence & Product Analyst",
+  "company": "MarketPulse Media",
+  "location": "Los Angeles, CA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 2,
+  "description": "Uncover user retention trends, conversion funnel drop-offs, and feature adoption metrics to guide executive product roadmaps.\n\nResponsibilities:\n• Write complex SQL analytical queries (window functions, cohort analysis, retention curves)\n• Build automated executive KPI dashboards in Tableau and PowerBI\n• Partner with product managers to formulate clear quantitative hypotheses\n• Conduct exploratory data analysis using Python and Pandas for ad-hoc inquiries\n\nRequirements:\n• Experience with SQL\n• Experience with Tableau\n• Experience with Python\n• Experience with Data Analysis\n• Experience with Statistics\n• Experience with Pandas\n\nNice to have:\n• PowerBI\n• A/B Testing\n• dbt\n• Excel\n\nCompensation: $80,000–$105,000 per year"
+ },
+ {
+  "id": "securefin-appsec-026",
+  "title": "Product Security Engineer",
+  "company": "SecureFin Digital Banking",
+  "location": "New York, NY",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 5,
+  "description": "Act as the primary security partner for fintech engineering pods, ensuring zero cryptographic regressions, hardened API authentication, and PCI-DSS compliance.\n\nResponsibilities:\n• Conduct threat modeling and architectural security reviews for new financial features\n• Audit OAuth2/OIDC implementation, JWT token handling, and session storage\n• Review third-party open source dependency risk and maintain software bill of materials (SBOM)\n• Champion secure coding best practices and organize internal capture-the-flag workshops\n\nRequirements:\n• Experience with Application Security\n• Experience with Python\n• Experience with OWASP\n• Experience with OAuth2\n• Experience with Cryptography\n• Experience with REST API\n• 5+ years of professional software experience\n\nNice to have:\n• Java\n• FinTech\n• Threat Modeling\n• Kubernetes\n\nCompensation: $145,000–$185,000 per year"
+ },
+ {
+  "id": "novanlp-research-027",
+  "title": "Machine Learning Scientist, Multimodal AI",
+  "company": "NovaNLP Laboratories",
+  "location": "Seattle, WA",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 8,
+  "description": "Lead applied research in cross-attention architectures linking vision and language models for zero-shot video understanding and document reasoning.\n\nResponsibilities:\n• Train large-scale multimodal models using PyTorch, DeepSpeed, and Megatron-LM\n• Curate high-quality synthetic pre-training and reinforcement learning (RLHF/DPO) datasets\n• Publish findings in top academic machine learning conferences (NeurIPS, ICML, ACL)\n• Translate scientific breakthroughs into lightweight deployable checkpoint artifacts\n\nRequirements:\n• Experience with Python\n• Experience with PyTorch\n• Experience with Deep Learning\n• Experience with Transformers\n• Experience with NLP\n• Experience with Machine Learning\n• 5+ years of professional software experience\n\nNice to have:\n• Computer Vision\n• DeepSpeed\n• RLHF\n• CUDA\n\nCompensation: $165,000–$215,000 per year"
+ },
+ {
+  "id": "agilestack-mobile-028",
+  "title": "iOS Mobile Application Engineer",
+  "company": "AgileStack Mobile",
+  "location": "San Diego, CA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 11,
+  "description": "Craft smooth, battery-efficient iOS client apps connecting hundreds of thousands of active users to real-time audio and social interactions.\n\nResponsibilities:\n• Develop modern declarative iOS interfaces with Swift and SwiftUI\n• Architect offline-first local cache synchronization using CoreData and SwiftData\n• Instrument mobile telemetry, crash analytics, and memory footprint tracking\n• Ship reliable weekly App Store releases via Fastlane automation\n\nRequirements:\n• Experience with Swift\n• Experience with iOS\n• Experience with SwiftUI\n• Experience with Git\n• Experience with REST API\n• Experience with Testing\n• 2+ years of professional experience\n\nNice to have:\n• CoreData\n• Fastlane\n• Combine\n• GraphQL\n\nCompensation: $115,000–$145,000 per year"
+ },
+ {
+  "id": "cloudmatrix-k8s-029",
+  "title": "Kubernetes Infrastructure Specialist",
+  "company": "CloudMatrix Systems",
+  "location": "Austin, TX",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 14,
+  "description": "Build high-density container orchestration clusters running heterogeneous GPU and CPU compute workloads across bare-metal and hybrid public clouds.\n\nResponsibilities:\n• Author custom Kubernetes Operators in Go using Kubebuilder and Controller-Runtime\n• Optimize Cilium eBPF network routing and pod network throughput\n• Automate cluster provisioning across multi-tenant regions with Cluster API\n• Manage hardware-accelerated GPU device plugin drivers for AI inference pods\n\nRequirements:\n• Experience with Kubernetes\n• Experience with Go\n• Experience with Linux\n• Experience with Docker\n• Experience with Terraform\n• Experience with Distributed Systems\n• 5+ years of professional software experience\n\nNice to have:\n• eBPF\n• Cilium\n• GPU Orchestration\n• Prometheus\n\nCompensation: $145,000–$180,000 per year"
+ },
+ {
+  "id": "dataweave-etl-030",
+  "title": "Analytics Engineer & Semantic Modeler",
+  "company": "DataWeave Insights",
+  "location": "Chicago, IL",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 17,
+  "description": "Bridge raw data warehousing infrastructure and business intelligence by crafting rigorous, tested dbt models and self-service semantic metrics.\n\nResponsibilities:\n• Develop modular, incremental dbt models adhering to star-schema modeling conventions\n• Automate data quality testing, freshness alerts, and schema documentation\n• Optimize Snowflake warehouse query costs, clustering keys, and caching\n• Partner with growth and finance teams to codify enterprise metric definitions\n\nRequirements:\n• Experience with SQL\n• Experience with dbt\n• Experience with Snowflake\n• Experience with Data Warehousing\n• Experience with Python\n• Experience with Git\n• 2+ years of professional experience\n\nNice to have:\n• Airflow\n• BigQuery\n• Looker\n• CI/CD\n\nCompensation: $110,000–$138,000 per year"
+ },
+ {
+  "id": "infinitenet-backend-031",
+  "title": "Backend Microservices Architect",
+  "company": "InfiniteNet Telecom",
+  "location": "Philadelphia, PA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 20,
+  "description": "Lead the modernization of legacy monolithic services into resilient, event-driven microservices processing network signaling and subscriber billing.\n\nResponsibilities:\n• Develop scalable microservices in Java/Spring Boot and Go\n• Design event streaming schemas using Apache Kafka and Avro\n• Refactor relational database queries in Oracle and PostgreSQL for zero downtime\n• Enforce microservice observability standards with Jaeger distributed tracing\n\nRequirements:\n• Experience with Java\n• Experience with Spring Boot\n• Experience with SQL\n• Experience with Kafka\n• Experience with Microservices\n• Experience with Docker\n• 5+ years of professional software experience\n\nNice to have:\n• Go\n• PostgreSQL\n• Kubernetes\n• gRPC\n\nCompensation: $140,000–$175,000 per year"
+ },
+ {
+  "id": "pixelwave-ux-032",
+  "title": "UI/UX Design Systems Engineer",
+  "company": "PixelWave Studio",
+  "location": "New York, NY",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 23,
+  "description": "Design and engineer enterprise design system components uniting Figma mockups with bulletproof, accessible React/TypeScript web implementations.\n\nResponsibilities:\n• Build accessible headless components (Radix/Aria) in React, TypeScript, and Tailwind\n• Maintain Storybook documentation and automated visual regression test suites\n• Conduct WCAG 2.1 AA accessibility audits and screen-reader usability trials\n• Partner with UX designers to translate fluid design tokens into CSS variables\n\nRequirements:\n• Experience with React\n• Experience with TypeScript\n• Experience with CSS\n• Experience with Accessibility\n• Experience with Design systems\n• Experience with Testing\n• 2+ years of professional experience\n\nNice to have:\n• Storybook\n• Tailwind CSS\n• Figma\n• Playwright\n\nCompensation: $115,000–$145,000 per year"
+ },
+ {
+  "id": "trustauth-security-033",
+  "title": "Zero Trust Security Architect",
+  "company": "TrustAuth Identity",
+  "location": "Washington, DC",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 26,
+  "description": "Architect zero-trust access fabrics, microsegmentation, and device health attestation across thousands of remote corporate workstations and cloud resources.\n\nResponsibilities:\n• Architect mutual TLS (mTLS), SPIFFE/SPIRE, and identity-aware proxy perimeters\n• Develop automated identity lifecycle management and privileged access policies\n• Conduct adversary emulation and purple-team exercises against perimeter gateways\n• Present threat models and executive risk briefings to C-level stakeholders\n\nRequirements:\n• Experience with Cybersecurity\n• Experience with Network Security\n• Experience with Linux\n• Experience with Application Security\n• Experience with Python\n• Experience with Cloud Security\n• 5+ years of professional software experience\n\nNice to have:\n• mTLS\n• Zero Trust\n• OAuth2\n• PKI\n\nCompensation: $150,000–$195,000 per year"
+ },
+ {
+  "id": "algosphere-ds-034",
+  "title": "Recommendation Systems Engineer",
+  "company": "AlgoSphere Social",
+  "location": "New York, NY",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 29,
+  "description": "Build two-stage retrieval and ranking models driving personalized video discovery feeds for 20M+ daily active mobile viewers.\n\nResponsibilities:\n• Train graph neural networks and deep factorization machines in PyTorch\n• Scale approximate nearest neighbor (ANN) vector search indexes (HNSW, ScaNN)\n• Run multivariate online A/B trials tracking long-term user engagement and diversity\n• Collaborate with trust and safety teams to down-rank clickbait and toxic content\n\nRequirements:\n• Experience with Python\n• Experience with PyTorch\n• Experience with Recommendation Systems\n• Experience with SQL\n• Experience with A/B Testing\n• Experience with Machine Learning\n• 2+ years of professional experience\n\nNice to have:\n• Graph Neural Networks\n• HNSW\n• Spark\n• MLOps\n\nCompensation: $135,000–$170,000 per year"
+ },
+ {
+  "id": "corepulse-go-035",
+  "title": "Go Backend Developer, Cloud Core",
+  "company": "CorePulse Technologies",
+  "location": "Austin, TX",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 32,
+  "description": "Write fast, concurrent microservices in Go backing our multi-tenant cloud storage gateway and metadata caching services.\n\nResponsibilities:\n• Develop gRPC and REST service endpoints in idiomatic Go\n• Write comprehensive unit and integration tests with race detector validation\n• Implement connection pooling, retries with backoff, and distributed rate limiting\n• Package services into minimal scratch Docker containers and deploy to Kubernetes\n\nRequirements:\n• Experience with Go\n• Experience with SQL\n• Experience with Docker\n• Experience with REST API\n• Experience with Git\n• Experience with Linux\n\nNice to have:\n• gRPC\n• PostgreSQL\n• Kubernetes\n• Redis\n\nCompensation: $92,000–$122,000 per year"
+ },
+ {
+  "id": "healthai-cv-036",
+  "title": "Medical Imaging AI Research Engineer",
+  "company": "HealthAI Diagnostics",
+  "location": "Boston, MA",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 0,
+  "description": "Develop 3D convolutional neural networks and vision transformers for automated anomaly detection in MRI and CT radiology scans.\n\nResponsibilities:\n• Preprocess and augment volumetric DICOM imaging scans with MONAI and PyTorch\n• Train segmentation and classification models with certified clinical accuracy\n• Validate model explainability using Grad-CAM and integrated gradients\n• Ensure full adherence to FDA software-as-a-medical-device (SaMD) validation\n\nRequirements:\n• Experience with Python\n• Experience with PyTorch\n• Experience with Computer Vision\n• Experience with Deep Learning\n• Experience with Healthcare data\n• Experience with Statistics\n• 5+ years of professional software experience\n\nNice to have:\n• MONAI\n• DICOM\n• Medical Imaging\n• 3D Segmentation\n\nCompensation: $155,000–$195,000 per year"
+ },
+ {
+  "id": "edgeflow-iot-037",
+  "title": "Embedded Linux & IoT Firmware Engineer",
+  "company": "EdgeFlow Technologies",
+  "location": "Phoenix, AZ",
+  "work_mode": "On-site",
+  "employment_type": "Full-time",
+  "posted_days_ago": 3,
+  "description": "Develop robust, secure firmware and device drivers for industrial IoT telemetry gateways operating in harsh environmental conditions.\n\nResponsibilities:\n• Write C and C++ firmware for ARM Cortex processors and embedded Linux\n• Implement low-power MQTT and CoAP wireless telemetry protocols with TLS\n• Build secure over-the-air (OTA) dual-bank A/B firmware update routines\n• Debug hardware timing issues using logic analyzers and oscilloscopes\n\nRequirements:\n• Experience with C++\n• Experience with C\n• Experience with Linux\n• Experience with Embedded Systems\n• Experience with Git\n• Experience with Network Security\n• 2+ years of professional experience\n\nNice to have:\n• Yocto\n• ARM\n• MQTT\n• Device Drivers\n\nCompensation: $110,000–$140,000 per year"
+ },
+ {
+  "id": "statgen-biostat-038",
+  "title": "Biostatistician & Clinical Trial Methodologist",
+  "company": "StatGen Clinical Research",
+  "location": "Raleigh, NC",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 6,
+  "description": "Design statistical analysis plans (SAPs), calculate sample sizes, and perform survival analysis for Phase II/III clinical oncology studies.\n\nResponsibilities:\n• Author rigorous statistical analysis plans in compliance with FDA and ICH guidelines\n• Perform Kaplan-Meier survival analysis and Cox proportional hazards regression in R\n• Prepare automated clinical study reports and electronic Common Technical Documents (eCTD)\n• Perform blinded data reviews and present efficacy interim reports to safety boards\n\nRequirements:\n• Experience with R\n• Experience with Statistics\n• Experience with Healthcare data\n• Experience with Time series\n• Experience with Data Analysis\n• Experience with Python\n• 2+ years of professional experience\n\nNice to have:\n• Survival Analysis\n• Clinical Trials\n• SAS\n• Biostatistics\n\nCompensation: $115,000–$145,000 per year"
+ },
+ {
+  "id": "cloudnexus-architect-039",
+  "title": "Principal Enterprise Cloud Architect",
+  "company": "CloudNexus Consulting",
+  "location": "Chicago, IL",
+  "work_mode": "Hybrid",
+  "employment_type": "Full-time",
+  "posted_days_ago": 9,
+  "description": "Lead enterprise multi-cloud transformation roadmaps, migrating legacy financial core applications to scalable AWS and GCP cloud architectures.\n\nResponsibilities:\n• Author enterprise architecture blueprints spanning hybrid clouds and landing zones\n• Conduct high-level architectural trade-off reviews and disaster recovery designs\n• Advise Fortune 500 VP of Engineering on cloud FinOps and organizational scaling\n• Direct technical proofs-of-concept for mission-critical migration workstreams\n\nRequirements:\n• Experience with AWS\n• Experience with Kubernetes\n• Experience with Distributed Systems\n• Experience with Cloud Security\n• Experience with Terraform\n• Experience with Microservices\n• 5+ years of professional software experience\n\nNice to have:\n• GCP\n• Enterprise Architecture\n• FinOps\n• Disaster Recovery\n\nCompensation: $175,000–$225,000 per year"
+ },
+ {
+  "id": "deepguard-ai-safety-040",
+  "title": "AI Safety & Alignment Research Engineer",
+  "company": "DeepGuard Safety Institute",
+  "location": "San Francisco, CA",
+  "work_mode": "Remote",
+  "employment_type": "Full-time",
+  "posted_days_ago": 12,
+  "description": "Develop adversarial red-teaming, mechanistic interpretability probes, and unlearning algorithms to guarantee foundation models cannot be jailbroken.\n\nResponsibilities:\n• Construct automated adversarial red-teaming harnesses testing LLM jailbreaks\n• Train probe classifiers to detect deceptive alignment and hidden reasoning states\n• Implement machine unlearning techniques to remove hazardous domain knowledge\n• Publish empirical safety benchmarks and release open-source defense tools\n\nRequirements:\n• Experience with Python\n• Experience with PyTorch\n• Experience with Transformers\n• Experience with LLM\n• Experience with NLP\n• Experience with Machine Learning\n• 5+ years of professional software experience\n\nNice to have:\n• Mechanistic Interpretability\n• Red Teaming\n• AI Safety\n• RLHF\n\nCompensation: $160,000–$210,000 per year"
+ }
+]

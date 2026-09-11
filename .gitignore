@@ -9,6 +9,6 @@ venv/
 .env
 .streamlit/secrets.toml
 .DS_Store
-
-# Sentence Transformers / Hugging Face model cache (keep it outside Git)
 .cache/
+# Local agent data: resume, jobs, runs, caches
+.jobpilot/
