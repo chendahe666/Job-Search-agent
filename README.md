@@ -187,5 +187,3 @@ modules.
 ## License
 
 No license file is currently included in this repository — all rights reserved by default until one is added. If
-you intend to open-source this project, add a `LICENSE` file (e.g. MIT, Apache-2.0) to clarify usage terms for
-others.

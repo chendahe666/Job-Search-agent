@@ -223,7 +223,7 @@ class ReasoningAgent:
             from google import genai
             from google.genai import types
 
-            client = self._client or genai.Client(api_key=self.api_key)
+            client = self._client or genai.Client(api_key=self.api_key, http_options=types.HttpOptions(timeout=20000))
             response = client.models.generate_content(
                 model=self.model,
                 contents=user_prompt,
@@ -265,7 +265,7 @@ class ReasoningAgent:
             client = self._client
         else:
             from groq import Groq
-            client = Groq(api_key=self.api_key)
+            client = Groq(api_key=self.api_key, timeout=20.0, max_retries=0)
 
         response = client.chat.completions.create(
             model=self.model,

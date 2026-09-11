@@ -45,14 +45,14 @@ class AIMatcher:
         "Candidate Profile:\n{profile_json}\n\n"
         "Job Posting:\n{job_json}\n\n"
         "Output ONLY a JSON object with this exact schema:\n"
-        "{\n"
+        "{{\n"
         '  "match_score": float (0.0 to 1.0),\n'
         '  "summary": string,\n'
         '  "matched_skills": [string],\n'
         '  "skill_gaps": [string],\n'
         '  "hallucination_flag": bool,\n'
         '  "hallucinated_claims": [string]\n'
-        "}"
+        "}}"
     )
 
     def __init__(
@@ -67,10 +67,10 @@ class AIMatcher:
         self._client = client
 
         if self.provider == "gemini":
-            self.api_key = (api_key or os.getenv("GEMINI_API_KEY", "")).strip()
+            self.api_key = (api_key if api_key is not None else os.getenv("GEMINI_API_KEY", "")).strip()
             self.model = model or os.getenv("GEMINI_MODEL", self.DEFAULT_GEMINI_MODEL)
         else:
-            self.api_key = (api_key or os.getenv("GROQ_API_KEY", "")).strip()
+            self.api_key = (api_key if api_key is not None else os.getenv("GROQ_API_KEY", "")).strip()
             self.model = model or os.getenv("GROQ_MODEL", self.DEFAULT_GROQ_MODEL)
 
     def _simulate_naive_ai(

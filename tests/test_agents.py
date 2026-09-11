@@ -276,12 +276,12 @@ class EvidenceGrounderTests(unittest.TestCase):
             "responsibilities": ["Train models", "Scale clusters"],
         }
 
-    def test_evidence_grounder_enforces_zero_hallucination(self):
+    def test_evidence_grounder_preserves_sources_without_claiming_verification(self):
         from agents.evidence_grounder import EvidenceGrounder
 
         report = EvidenceGrounder.audit_match(self.profile, self.job)
 
-        self.assertEqual(report.hallucination_rate, 0.00)
+        self.assertIsNone(report.hallucination_rate)
         self.assertIn("Python", report.verified_skills)
         self.assertIn("PyTorch", report.verified_skills)
         self.assertIn("Kubernetes", report.skill_gaps)
@@ -289,7 +289,8 @@ class EvidenceGrounderTests(unittest.TestCase):
 
         # Check citation tags in tailored bullets
         self.assertTrue(any("[Src:" in b for b in report.tailored_bullets))
-        self.assertGreaterEqual(report.ats_readability_score, 60)
+        self.assertIsNone(report.ats_readability_score)
+        self.assertEqual(report.evidence_tree[0]["status"], "SELF_REPORTED")
 
 
 class DataLayerTests(unittest.TestCase):
@@ -311,4 +312,3 @@ class DataLayerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -31,9 +31,12 @@ class EmbeddingAgent:
         model_name: str = DEFAULT_MODEL,
         *,
         encoder: TextEncoder | None = None,
+        local_files_only: bool = False,
     ) -> None:
         self.model_name = model_name
         self._encoder = encoder
+        self.local_files_only = local_files_only
+        self.backend = "Injected encoder" if encoder is not None else "MiniLM semantic embeddings"
 
     def _get_encoder(self) -> TextEncoder:
         """Load the Hugging Face model, falling back gracefully to TF-IDF."""
@@ -41,7 +44,7 @@ class EmbeddingAgent:
         if self._encoder is None:
             try:
                 from sentence_transformers import SentenceTransformer
-                self._encoder = SentenceTransformer(self.model_name)
+                self._encoder = SentenceTransformer(self.model_name, local_files_only=self.local_files_only)
             except Exception:  # pragma: no cover - graceful fallback
                 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -59,6 +62,7 @@ class EmbeddingAgent:
                         return vec.fit_transform(sentences).toarray()
 
                 self._encoder = TfidfFallbackEncoder()
+                self.backend = "TF-IDF（模型不可用，已使用关键词替代）"
         return self._encoder
 
     @staticmethod

@@ -10,5 +10,7 @@ venv/
 .streamlit/secrets.toml
 .DS_Store
 .cache/
+
 # Local agent data: resume, jobs, runs, caches
 .jobpilot/
+local_data/
