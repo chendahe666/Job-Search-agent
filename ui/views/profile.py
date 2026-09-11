@@ -31,9 +31,13 @@ AUTH_NEEDS_SPONSORSHIP = {WorkAuth.F1_CPT, WorkAuth.F1_OPT, WorkAuth.F1_STEM_OPT
 def multiselect_free(label_text: str, options: list[str], default: list[str], key: str, help_text: str = "", placeholder: str = "") -> list[str]:
     """Multiselect that also accepts typed values (falls back gracefully on older Streamlit)."""
     opts = list(dict.fromkeys(list(default) + list(options)))
+    # Once the session holds a value for this key it is the source of truth; passing
+    # `default` as well is what makes Streamlit complain about double-setting a widget.
+    seeded = key in st.session_state
     try:
-        return st.multiselect(label_text, opts, default=default, key=key, help=help_text or None,
-                              accept_new_options=True, placeholder=placeholder or None)
+        kwargs = {} if seeded else {"default": default}
+        return st.multiselect(label_text, opts, key=key, help=help_text or None,
+                              accept_new_options=True, placeholder=placeholder or None, **kwargs)
     except TypeError:
         raw = st.text_input(label_text, ", ".join(default), key=key + "_txt", help=help_text or None)
         return [x.strip() for x in raw.split(",") if x.strip()]
@@ -41,32 +45,36 @@ def multiselect_free(label_text: str, options: list[str], default: list[str], ke
 
 def render() -> None:
     lang = state.lang()
+    # Seed every keyed multi-select once per session so a selection survives stepping away and back.
+    p = state.prefs()
+    for widget_key, value in (("tg_sen", p.seniority), ("tg_et", p.employment_types), ("tg_modes", p.work_modes),
+                              ("tg_titles", p.target_titles), ("tg_locs", p.locations), ("tg_kw", p.extra_keywords),
+                              ("cons_cb", p.company_blocklist), ("cons_te", p.title_exclude_keywords),
+                              ("prio_dream", p.dream_companies)):
+        st.session_state.setdefault(widget_key, list(value))
     st.title(t("profile.title"))
     st.markdown(f'<div class="jp-sub">{t("profile.subtitle")}</div>', unsafe_allow_html=True)
     step = st.session_state.wizard_step
-    C.stepper([t(s) for s in STEPS], step)
-    st.session_state["wiz_jump"] = step
-    st.segmented_control(t("wiz.jump"), options=list(range(len(STEPS))), format_func=lambda i: f"{i + 1}. {t(STEPS[i])}",
-                         key="wiz_jump", label_visibility="collapsed", on_change=_on_jump)
+    reached = max(st.session_state.get("wizard_max_step", 0), step)
+    st.session_state.wizard_max_step = reached
+    picked = C.stepper_nav([t(s) for s in STEPS], step, reached)
+    if picked is not None and picked != step:
+        st.session_state.wizard_step = picked
+        st.rerun()
 
     [step_resume, step_targets, step_constraints, step_priorities, step_review][step](lang)
 
 
-def _on_jump() -> None:
-    picked = st.session_state.get("wiz_jump")
-    if picked is not None:
-        st.session_state.wizard_step = picked
-
-
 def nav_buttons(can_next: bool = True, next_label: str = "") -> None:
     st.divider()
-    c1, _, c3 = st.columns([1, 3, 1])
+    c1, _, c3 = st.columns([1.5, 2, 1.5])  # wide enough that "下一步 →" stays on one line
     step = st.session_state.wizard_step
     if step > 0 and c1.button("← " + t("common.back"), width="stretch"):
         st.session_state.wizard_step -= 1
         st.rerun()
     if step < len(STEPS) - 1 and c3.button((next_label or t("common.next")) + " →", type="primary", width="stretch", disabled=not can_next):
         st.session_state.wizard_step += 1
+        st.session_state.wizard_max_step = max(st.session_state.get("wizard_max_step", 0), st.session_state.wizard_step)
         st.rerun()
 
 
@@ -184,13 +192,13 @@ def step_targets(lang: str) -> None:
         families = st.multiselect(t("targets.families"), list(ROLE_FAMILIES), default=[f for f in p.role_families if f in ROLE_FAMILIES],
                                   help=t("targets.families_help"))
         seniority = st.pills(t("targets.seniority") + " *", [s for s in Seniority if s != Seniority.UNKNOWN], selection_mode="multi",
-                             default=p.seniority, format_func=lambda s: label(s, lang), key="tg_sen")
+                             format_func=lambda s: label(s, lang), key="tg_sen")
         etypes = st.pills(t("targets.etypes"), [e for e in EmploymentType if e != EmploymentType.UNKNOWN], selection_mode="multi",
-                          default=p.employment_types, format_func=lambda e: label(e, lang), key="tg_et")
+                          format_func=lambda e: label(e, lang), key="tg_et")
         keywords = multiselect_free(t("targets.keywords"), [], p.extra_keywords, "tg_kw", t("targets.keywords_help"))
     with c2:
         modes = st.pills(t("targets.modes") + " *", [WorkMode.REMOTE, WorkMode.HYBRID, WorkMode.ONSITE], selection_mode="multi",
-                         default=p.work_modes, format_func=lambda m: label(m, lang), key="tg_modes", help=t("targets.modes_help"))
+                         format_func=lambda m: label(m, lang), key="tg_modes", help=t("targets.modes_help"))
         loc_options = list(US_METROS) + [f"{v}" for v in US_STATES.values()]
         locations = multiselect_free(t("targets.locations"), loc_options, p.locations, "tg_locs", t("targets.locations_help"))
         relocate = st.toggle(t("targets.relocate"), p.willing_to_relocate)

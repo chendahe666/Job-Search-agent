@@ -27,7 +27,6 @@ own ATS page, filters out hard conflicts, matches each requirement to verbatim e
 - [Testing](#testing)
 - [Cost & limits](#cost--limits)
 - [Migrating from the legacy RoleSignal (v1) code](#migrating-from-the-legacy-rolesignal-v1-code)
-- [Known issues](#known-issues)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -114,18 +113,31 @@ python scripts/smoke_gemini.py "Machine Learning Engineer" "Austin, TX"
 
 ## Using the app
 
-1. **设置档案 / Setup** — upload or paste your resume, review the parsed profile, then fill in targets, hard
-   constraints and priorities.
-2. **运行 Agent / Run** — the agent runs on a background thread; watch every stage live and stop it at any time.
-3. **匹配结果 / Matches** — tiered cards (A apply now · B tailor · C stretch · excluded with reasons), an evidence
+The sidebar groups pages in the order of an actual job hunt, and every page has its own URL:
+
+| Section | Pages |
+|---|---|
+| 开始 / Get started | **概览 / Home** · **设置档案 / Setup** |
+| 搜索职位 / Find jobs | **运行 Agent / Run** · **匹配结果 / Matches** |
+| 跟踪投递 / Track | **投递看板 / Pipeline** · **运行报告 / Reports** |
+| 系统 / System | **设置 / Settings** |
+
+1. **概览 / Home** — the landing page computes your single next step (add a resume → set targets → run a
+   search → review matches) and offers exactly one primary button for it, so there is never a question of what to
+   do first.
+2. **设置档案 / Setup** — a 5-step wizard (resume → targets → hard constraints → priorities → review). One
+   clickable stepper shows where you are; completed steps are revisitable, and steps ahead stay locked until the
+   current one validates.
+3. **运行 Agent / Run** — the agent runs on a background thread; watch every stage live and stop it at any time.
+4. **匹配结果 / Matches** — tiered cards (A apply now · B tailor · C stretch · excluded with reasons), an evidence
    matrix, a verification log, a fact-checked application kit, and 👍/👎 feedback.
-4. **投递看板 / Pipeline** and **运行报告 / Reports** — track applications and export a run as Markdown/CSV.
+5. **投递看板 / Pipeline** and **运行报告 / Reports** — track applications and export a run as Markdown/CSV.
 
 ## Project layout
 
 ```text
-app.py                      Streamlit entry point (top navigation, language toggle)
-ui/                          views (profile wizard, run, matches, pipeline, reports, settings), i18n, components, runner
+app.py                      Streamlit entry point (grouped sidebar navigation, language toggle)
+ui/                          views (home, profile wizard, run, matches, pipeline, reports, settings), i18n, components, runner
 jobpilot/
   schemas.py                Pydantic domain models (profile, preferences, posting, evidence, run report)
   taxonomy.py                dropdown data, skill synonyms, metros, sponsorship & closed-posting patterns
@@ -141,7 +153,7 @@ jobpilot/
   report/                    Markdown/CSV export, fact-checked tailoring
   storage/db.py               SQLite (`.jobpilot/jobpilot.db`)
 tests/                        unit + end-to-end pipeline tests (simulated Gemini/HTTP) + Streamlit AppTest UI tests
-scripts/                      smoke_gemini.py, cleanup_legacy.py
+scripts/                      smoke_gemini.py, ux_metrics.py, cleanup_legacy.py
 ```
 
 ## Testing
@@ -151,8 +163,31 @@ python -m unittest discover -s tests -t .
 ```
 
 The suite covers the agent pipeline end-to-end against simulated Gemini/HTTP responses (`tests/fakes.py`), the core
-`jobpilot` modules, and the Streamlit UI via `streamlit.testing.v1.AppTest`. See [Known issues](#known-issues) for
-current failures.
+`jobpilot` modules, and the Streamlit UI via `streamlit.testing.v1.AppTest`. Tests never touch the live API: they
+set `GEMINI_API_KEY` to an empty string so `load_dotenv()` cannot pull a real key out of your `.env`.
+
+### UI complexity metrics
+
+Navigation and layout changes are easy to argue about and hard to verify, so the landing screen is measured rather
+than debated:
+
+```bash
+python scripts/ux_metrics.py
+```
+
+It renders the app headless on a throwaway database and counts what a first-time user actually faces. The move from
+a top nav + wizard-first landing page to a grouped sidebar + Home page:
+
+| Metric | Before | After |
+|---|---|---|
+| Enabled primary actions on the landing screen | 0 | **1** |
+| Controls telling you which wizard step you're on | 2 | **1** |
+| Rendered elements on the landing screen | 22 | **15** |
+| Interactive widgets on the landing screen | 5 | **1** |
+
+Zero enabled primary actions was the concrete version of "I don't know what to do first": both primary buttons on
+the old landing page were disabled until you had already typed something. `tests/test_ui.py` now asserts the
+landing screen offers exactly one enabled primary action, so that cannot regress silently.
 
 ## Cost & limits
 
@@ -171,12 +206,6 @@ Remove it once you no longer need it:
 python scripts/cleanup_legacy.py --yes     # dry run without --yes
 # or: git rm -r agents data evals report tests/test_agents.py
 ```
-
-## Known issues
-
-- `tests/test_ui.py::test_1_wizard_to_demo_run_to_matches` currently fails (`KeyError` on an uninitialized
-  `st.session_state` widget key) when run via `streamlit.testing.v1.AppTest` on Streamlit ≥ 1.60 — all other 37
-  tests pass. Tracked as a follow-up; contributions welcome.
 
 ## Contributing
 
