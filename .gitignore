@@ -14,3 +14,5 @@ venv/
 # Local agent data: resume, jobs, runs, caches
 .jobpilot/
 local_data/
+# Local editor/tooling config (machine-specific launch commands)
+.claude/

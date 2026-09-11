@@ -38,6 +38,7 @@ def init() -> None:
     ss.setdefault("model", settings.get("model") or os.getenv("GEMINI_MODEL", DEFAULT_MODEL))
     ss.setdefault("embed_model", settings.get("embed_model") or os.getenv("GEMINI_EMBED_MODEL", DEFAULT_EMBED_MODEL))
     ss.setdefault("wizard_step", 0)
+    ss.setdefault("wizard_max_step", 0)
     ss.setdefault("selected_job", None)
     if "profile" not in ss:
         ss.profile = db.load_profile() or CandidateProfile()

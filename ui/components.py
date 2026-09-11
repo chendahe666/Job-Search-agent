@@ -56,6 +56,20 @@ def ghost_badge(risk: GhostRisk, lang: str) -> str:
     return badge(("ghost " if lang == "en" else "幽灵风险 ") + label(risk, lang), "amber" if risk == GhostRisk.MEDIUM else "red", "👻")
 
 
+def stepper_nav(steps: list[str], current: int, reached: int, key_prefix: str = "wiz") -> Optional[int]:
+    """Clickable stepper: shows position *and* moves between steps, so the two aren't separate controls.
+
+    Only steps the user already reached are clickable — moving forward stays with Next, which validates.
+    """
+    picked = None
+    for i, (col, text) in enumerate(zip(st.columns(len(steps)), steps)):
+        prefix = "✓" if i < current else f"{i + 1}"
+        if col.button(f"{prefix}  {text}", key=f"{key_prefix}_step_{i}", width="stretch",
+                      type="primary" if i == current else "secondary", disabled=i > reached):
+            picked = i
+    return picked
+
+
 def stepper(steps: list[str], current: int, done: Optional[Iterable[int]] = None) -> None:
     done = set(done or range(current))
     parts = []

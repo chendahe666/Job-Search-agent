@@ -50,27 +50,58 @@ class UITest(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp = tempfile.mkdtemp()
         os.environ["JOBPILOT_DB"] = str(Path(cls.tmp) / "ui.db")
-        os.environ.pop("GEMINI_API_KEY", None)
+        # Set it empty rather than removing it: load_dotenv() would otherwise pull the
+        # developer's real key out of .env and the suite would hit the live API.
+        os.environ["GEMINI_API_KEY"] = ""
         os.chdir(ROOT)
 
     def assertClean(self, at):
         self.assertFalse(at.exception, [e.message for e in at.exception])
 
-    def test_1_wizard_to_demo_run_to_matches(self):
+    def test_0_home_offers_exactly_one_next_step(self):
+        """A first-time user must land on a screen with one obvious, enabled action."""
         at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=60)
         at.session_state["api_key"] = ""
         at.run()
         self.assertClean(at)
+        enabled_primary = [b for b in at.button if b.proto.type == "primary" and not b.proto.disabled]
+        self.assertEqual(len(enabled_primary), 1, [b.label for b in at.button])
+        self.assertIn("简历", enabled_primary[0].label)
+
+    def _wizard(self, step: int):
+        """A fresh wizard instance parked on one step.
+
+        AppTest replays the widget tree of the previous run, so clicking through a step
+        change makes it look up widgets the new step never rendered. Each step gets its
+        own instance instead; shared state travels through the database, which also
+        proves the wizard actually persists what you type.
+        """
+        at = AppTest.from_string(VIEW.format(mod="profile", fn="render"), default_timeout=60)
+        at.session_state["api_key"] = ""
+        at.session_state["wizard_step"] = step
+        at.session_state["wizard_max_step"] = 4
+        at.run()
+        self.assertClean(at)
+        return at
+
+    def test_1_wizard_to_demo_run_to_matches(self):
+        at = self._wizard(0)
         at.text_area(key="resume_paste").input(RESUME).run()
         _btn(at, "解析简历").click().run()
         self.assertClean(at)
         _btn(at, "下一步").click().run()
-        at.multiselect(key="tg_titles").set_value(["Machine Learning Engineer", "Data Scientist"]).run()
-        at.multiselect(key="tg_locs").set_value(["Chicago, IL", "Austin, TX"]).run()
-        for _ in range(3):
-            _btn(at, "下一步").click().run() if any("下一步" in b.label for b in at.button) else _btn(at, "确认并开始").click().run()
-            self.assertClean(at)
-        self.assertClean(at)
+        self.assertEqual(at.session_state["wizard_step"], 1)
+
+        targets = self._wizard(1)
+        targets.multiselect(key="tg_titles").set_value(["Machine Learning Engineer", "Data Scientist"]).run()
+        targets.multiselect(key="tg_locs").set_value(["Chicago, IL", "Austin, TX"]).run()
+        self.assertClean(targets)
+
+        from ui import state as ui_state
+        self.assertIn("Machine Learning Engineer", ui_state.get_db().load_preferences().target_titles)
+
+        for step in (2, 3, 4):
+            self._wizard(step)
 
         run = AppTest.from_string(VIEW.format(mod="run", fn="render_page"), default_timeout=60)
         run.session_state["api_key"] = ""
